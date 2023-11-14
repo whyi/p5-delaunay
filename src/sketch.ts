@@ -1,6 +1,4 @@
 import P5 from "p5";
-import "p5/lib/addons/p5.dom";
-// import "p5/lib/addons/p5.sound";	// Include if needed
 import "./styles.scss";
 
 // DEMO: A sample class implementation
@@ -15,7 +13,7 @@ const sketch = (p5: P5) => {
 	p5.setup = () => {
 		// Creating and positioning the canvas
 		const canvas = p5.createCanvas(200, 200);
-		canvas.parent("app");
+		canvas.parent("sketch");
 
 		// Configuring the canvas
 		p5.background("white");
