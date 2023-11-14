@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "A template for a p5.js sketch using Typescript",
   "scripts": {
+    "run": "npx parcel index.html --open",
+    "build": "npx parcel build index.html",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
