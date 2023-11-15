@@ -6,7 +6,6 @@ import {expect} from '@jest/globals';
 import p5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 import { BOUNDARY } from '../../src/Mesh2D';
-import GeometricOperations from '../../src/GeometricOperations';
 
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
