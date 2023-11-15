@@ -38,7 +38,10 @@ afterEach(() => {
 describe('DelaunayTriangulation', () => {
   describe("addPoint", () => {
     it ("creates a new point and add it to gemoetry table", () => {
-
+      const newPoint = new p5.Vector(0.1, 0.1);
+      twoTriangles.addPoint(newPoint);
+      expect(twoTriangles.vertices[-1]).toBe(newPoint);
+      expect(twoTriangles.numberOfVertices).toBe(5);
     })
   })
 
