@@ -4,7 +4,7 @@
 
 import {expect} from '@jest/globals';
 import p5 from "p5";
-import { GeometricOperations } from '../../src/GeometricOperations';
+import GeometricOperations from '../../src/GeometricOperations';
 
 describe('GeometricOperations', () => {
     describe("Cross product", () => {
