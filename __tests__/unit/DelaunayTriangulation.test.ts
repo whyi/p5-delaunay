@@ -58,7 +58,13 @@ describe('DelaunayTriangulation', () => {
 
   describe("fixMesh", () => {
     it ("recursively flipCorners", () => {
+      const flipCornerMock = jest
+      .spyOn(DelaunayTriangulation.prototype, 'flipCorner')
+      .mockImplementation((dirtyCorners: number[]) => {
+        console.log('mocked function');
+      });
 
+      expect(flipCornerMock).toHaveBeenCalled();
     })
   })
 
