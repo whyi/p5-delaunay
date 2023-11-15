@@ -64,7 +64,9 @@ describe('DelaunayTriangulation', () => {
         console.log('mocked function');
       });
 
-      expect(flipCornerMock).toHaveBeenCalled();
+      const dirtyCorners:number[] = [0,1,2];
+      twoTriangles.fixMesh(dirtyCorners);
+      expect(flipCornerMock).toHaveBeenCalledTimes(dirtyCorners.length);
     })
   })
 
