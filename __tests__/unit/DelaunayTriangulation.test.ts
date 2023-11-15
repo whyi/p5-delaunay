@@ -6,6 +6,7 @@ import {expect} from '@jest/globals';
 import p5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 import { BOUNDARY } from '../../src/Mesh2D';
+import GeometricOperations from '../../src/GeometricOperations';
 
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
@@ -93,6 +94,31 @@ describe('DelaunayTriangulation', () => {
       expect(flipCornerSpy).toBeCalledTimes(1);
       expect(buildOTableSpy).toBeCalledTimes(1);
       expect(isDelaunayMock).toBeCalledTimes(1);
+    })
+  })
+
+  describe("isDelaunay", () => {
+    it ("returns true if opposite corner is outside of circumcircle's radius", () => {
+      isDelaunayMock.mockRestore();
+      expect(twoTriangles.isDelaunay(1)).toBe(true);
+    })
+    
+    it ("returns false if opposite corner is inside of circumcircle's radius", () => {
+      /*
+      Modify initial mock to make a very skewed triangles
+      0--1          0------------------1
+      |\ |   =>     |\________________ |
+      | \|          |                 \|
+      3--2          3------------------2
+      */
+      twoTriangles.vertices = [
+          new p5.Vector(0,0),
+          new p5.Vector(0,1),
+          new p5.Vector(1000,1),
+          new p5.Vector(1000,0)
+      ];
+      isDelaunayMock.mockRestore();
+      expect(twoTriangles.isDelaunay(1)).toBe(false);
     })
   })
 });
