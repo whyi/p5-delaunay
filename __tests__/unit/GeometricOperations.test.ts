@@ -107,10 +107,28 @@ describe('GeometricOperations', () => {
 
     describe("midVector", () => {
         it ("return middle point of 2 vectors", () => {
-            const v1 = new p5.Vector(0,0,0);
-            const v2 = new p5.Vector(1,1,1);
+            const v1 = new p5.Vector(0,0);
+            const v2 = new p5.Vector(1,1);
             const result = GeometricOperations.midVector(v1, v2);
             expect(result).toStrictEqual(new p5.Vector((v1.x+v2.x)/2, (v1.y+v2.y)/2));
+        })
+    })
+
+    describe("circumcenter", () => {
+        it ("return circumcenter of the triangle ABC's circumcircle", () => {
+            /*
+            https://www.wolframalpha.com/input?i=circumcenter+of+a+triangle+0%2C0+0%2C1+0.5%2C1
+            
+                A
+                | \ _____<<<here's the circumcenter
+                |  \
+                B---C
+            */
+            const pointA = new p5.Vector(0,0);
+            const pointB = new p5.Vector(0,1);
+            const pointC = new p5.Vector(0.5,1);
+            const result = GeometricOperations.circumcenter(pointA, pointB, pointC);
+            expect(result).toStrictEqual(new p5.Vector(0.25,0.5));
         })
     })
 });
