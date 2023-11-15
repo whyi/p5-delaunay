@@ -22,7 +22,7 @@ describe('GeometricOperations', () => {
             const v1 = new p5.Vector(x,y,z);
             unitVectors.map(v => new p5.Vector(v.x, v.y, v.z)).forEach(v2 => {
                 const result = GeometricOperations.cross2D(v1, v2);
-                expect(result).toBe(v2.x*v1.y - v2.y*v1.x);
+                expect(result).toBe(v1.x*v2.y - v1.y*v2.x);
             });
         })
     })
