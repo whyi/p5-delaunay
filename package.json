@@ -9,7 +9,7 @@
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "make-badges": "istanbul-badges-readme"
+    "make-badges": "npx jest --coverage && istanbul-badges-readme"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.2",
