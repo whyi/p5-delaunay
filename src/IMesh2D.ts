@@ -8,11 +8,11 @@ interface IMesh2D {
     corners: Array<number>;
     opposites: Array<number>;
     buildOTable: () => void;
-    GetGeometry:(cornerId: number) => Vector;
-    GetVertexId:(cornerId: number) => number;
-    GetOppositeCornerId:(cornerId: number) => number;
-    GetNextCornerId:(cornerId: number) => number;
-    GetPreviousCornerId:(cornerId: number) => number;
+    getGeometry:(cornerId: number) => Vector;
+    getVertexId:(cornerId: number) => number;
+    getOppositeCornerId:(cornerId: number) => number;
+    getNextCornerId:(cornerId: number) => number;
+    getPreviousCornerId:(cornerId: number) => number;
 }
 
 export {IMesh2D}
