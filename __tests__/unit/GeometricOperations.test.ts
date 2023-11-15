@@ -26,4 +26,34 @@ describe('GeometricOperations', () => {
             });
         })
     })
+
+    describe("isLeftTurn", () => {
+        it ("returns true when points A, B and C are turning left", () => {
+            /*
+                  C
+                   \ 
+                    \
+            A--------B
+            */
+            const pointA = new p5.Vector(0,0,0);
+            const pointB = new p5.Vector(1,0,0);
+            const pointC = new p5.Vector(0.75,0.75,0);
+            const result = GeometricOperations.isLeftTurn(pointA, pointB, pointC);
+            expect(result).toBe(true);
+        })
+
+        it ("returns false when points A, B and C are turning right", () => {
+            /*
+            A--------B
+                    /
+                   /
+                  C
+            */
+            const pointA = new p5.Vector(0,0,0);
+            const pointB = new p5.Vector(1,0,0);
+            const pointC = new p5.Vector(0.75,-0.75,0);
+            const result = GeometricOperations.isLeftTurn(pointA, pointB, pointC);
+            expect(result).toBe(false);
+        })
+    })
 });
