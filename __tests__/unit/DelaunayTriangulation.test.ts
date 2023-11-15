@@ -8,6 +8,7 @@ import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 import { BOUNDARY } from '../../src/Mesh2D';
 
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
+const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
 
 let twoTriangles: DelaunayTriangulation;
 function InitTwoTriangles()
@@ -37,6 +38,7 @@ beforeEach(() => {
 afterEach(() => {
     InitTwoTriangles();
     flipCornerSpy.mockClear();
+    buildOTableSpy.mockClear();
 })
 
 describe('DelaunayTriangulation', () => {
@@ -72,6 +74,12 @@ describe('DelaunayTriangulation', () => {
     it ("immediately returns with reach a boundary", () => {
       twoTriangles.flipCorner(BOUNDARY);
       expect(flipCornerSpy).toBeCalledTimes(1);
+    })
+
+    it ("buid O Table and returns if opposite of given corner is a boundary", () => {
+      twoTriangles.flipCorner(0);
+      expect(flipCornerSpy).toBeCalledTimes(1);
+      expect(buildOTableSpy).toBeCalledTimes(1);
     })
   })
 });
