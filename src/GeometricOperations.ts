@@ -13,6 +13,28 @@ export abstract class GeometricOperations {
     }
 
     public static intersection(S: P5.Vector, SE: P5.Vector, Q: P5.Vector, QE: P5.Vector): P5.Vector {
-        return new P5.Vector(-1,-1,-1);
+        const tangent = new P5.Vector(SE.x-S.x, SE.y-S.y);
+
+        const normalVector = new P5.Vector(QE.x-Q.x, QE.y-Q.y);
+        normalVector.normalize();
+
+        // left turn
+        const tmp = normalVector.x;
+        normalVector.x = -normalVector.y;
+        normalVector.y = tmp;
+
+        const QS = new P5.Vector(S.x-Q.x, S.y-Q.y);
+        const QSDotNormal = QS.dot(normalVector);
+        const tangentDotNormal = tangent.dot(normalVector);
+        const t = -QSDotNormal/tangentDotNormal;
+
+        if (!isFinite(t)) {
+            // return an undefined vector
+            return new P5.Vector();
+        }
+
+        tangent.mult(t);
+
+        return new P5.Vector(S.x+tangent.x,S.y+tangent.y);
     }
 }

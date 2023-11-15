@@ -3,7 +3,7 @@
  */
 
 import {expect, jest, test} from '@jest/globals';
-import p5 from "p5";
+import p5, { Vector } from "p5";
 import { GeometricOperations } from '../../src/GeometricOperations';
 
 describe('GeometricOperations', () => {
@@ -66,12 +66,44 @@ describe('GeometricOperations', () => {
                    |
                    Q
             */
-            const vecQ = new p5.Vector(5,5);
+            const vecS = new p5.Vector(0,5);
+            const vecSE = new p5.Vector(10,5);
+            const vecQ = new p5.Vector(5,10);
+            const vecQE = new p5.Vector(5,0);
+            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            expect(result).toStrictEqual(new p5.Vector(5,5));
+        })
+
+        it ("returns undefined point when 4 vectors(S, SE, Q, QE) don't intersect", () => {
+            /*
+            S------------SE
+
+            Q------------QE
+            */
             const vecS = new p5.Vector(0,0);
-            const vecSE = new p5.Vector(0,10);
-            const vecQE = new p5.Vector(5,-5);
-            const result = GeometricOperations.intersection(vecQ, vecS, vecSE, vecQE);
-            expect(result).toBe(new p5.Vector(0,5));
+            const vecSE = new p5.Vector(10,0);
+            const vecQ = new p5.Vector(0,5);
+            const vecQE = new p5.Vector(10,5);
+            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            expect(result).toStrictEqual(new p5.Vector(undefined,undefined));
+        })
+
+        it ("returns intersecting point of the 4 vectors(S, SE, Q, QE) (case2)", () => {
+            /*
+            QE
+            |
+            S------------SE
+            |
+            Q
+            */
+            const vecS = new p5.Vector(0,0);
+            const vecSE = new p5.Vector(10,0);
+            const vecQ = new p5.Vector(0,5);
+            const vecQE = new p5.Vector(0,-5);
+            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            expect(result).toStrictEqual(vecS);
         })
     })
+
+
 });
