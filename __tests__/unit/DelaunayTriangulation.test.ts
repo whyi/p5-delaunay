@@ -3,7 +3,7 @@
  */
 
 import {expect} from '@jest/globals';
-import p5, { Vector } from "p5";
+import P5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 import { BOUNDARY } from '../../src/Mesh2D';
 
@@ -26,10 +26,10 @@ function InitTwoTriangles()
     */
     twoTriangles = new DelaunayTriangulation(1)
     twoTriangles.vertices = [
-        new p5.Vector(0,0),
-        new p5.Vector(0,1),
-        new p5.Vector(1,1),
-        new p5.Vector(1,0)
+        new P5.Vector(0,0),
+        new P5.Vector(0,1),
+        new P5.Vector(1,1),
+        new P5.Vector(1,0)
     ];
     twoTriangles.numberOfVertices = 4;
     twoTriangles.corners = [0,1,2,2,3,0];
@@ -51,7 +51,7 @@ describe('DelaunayTriangulation', () => {
   describe("addPoint", () => {
     it ("creates a new point from x,y coordiante and add it to gemoetry table", () => {
       twoTriangles.addPoint(0.1, 0.1);
-      expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new p5.Vector(0.1, 0.1));
+      expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new P5.Vector(0.1, 0.1));
       expect(twoTriangles.numberOfVertices).toBe(5);
     })
   })
@@ -112,10 +112,10 @@ describe('DelaunayTriangulation', () => {
       3--2          3------------------2
       */
       twoTriangles.vertices = [
-          new p5.Vector(0,0),
-          new p5.Vector(0,1),
-          new p5.Vector(1,1),
-          new p5.Vector(1000,0)
+          new P5.Vector(0,0),
+          new P5.Vector(0,1),
+          new P5.Vector(1,1),
+          new P5.Vector(1000,0)
       ];
       isDelaunayMock.mockRestore();
       twoTriangles.buildOTable();

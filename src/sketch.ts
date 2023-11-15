@@ -1,37 +1,44 @@
 import P5 from "p5";
 import "./styles.scss";
 
-// DEMO: A sample class implementation
-import MyCircle from "./MyCircle";
+import DelaunayTriangulation from "./DelaunayTriangulation";
 
-// Creating the sketch itself
 const sketch = (p5: P5) => {
-	// DEMO: Prepare an array of MyCircle instances
-	const myCircles: MyCircle[] = [];
+	let delaunayTriangulation: DelaunayTriangulation;
+	let shouldDrawCircumcircles = false;
 
-	// The sketch setup method 
+	function toggleCircumcircles(): void {
+		shouldDrawCircumcircles = !shouldDrawCircumcircles;
+		if (shouldDrawCircumcircles) {
+			delaunayTriangulation.computeCircumcenters();
+		}
+	}
+
 	p5.setup = () => {
-		// Creating and positioning the canvas
-		const canvas = p5.createCanvas(200, 200);
+		const mySize = Math.min(p5.windowWidth, p5.windowHeight)-80;
+		const canvas = p5.createCanvas(mySize, mySize);
 		canvas.parent("sketch");
 
-		// Configuring the canvas
-		p5.background("white");
+		delaunayTriangulation = new DelaunayTriangulation(mySize, p5);
 
-		// DEMO: Create three circles in the center of the canvas
-		for (let i = 1; i < 4; i++) {
-			const p = p5.width / 4;
-			const circlePos = p5.createVector(p * i, p5.height / 2);
-			const size = i % 2 !== 0 ? 24 : 32;
-			myCircles.push(new MyCircle(p5, circlePos, size));
+		const button = p5.createButton('Click to toggle Circumcircles');
+		button.position(p5.windowWidth/2-120, 60);
+		button.mousePressed(toggleCircumcircles);
+	};
+
+	p5.draw = () => {
+		p5.background(0);
+		delaunayTriangulation.drawTriangles();
+		if (shouldDrawCircumcircles) {
+			delaunayTriangulation.drawCircumcircles();
 		}
 	};
 
-	// The sketch draw method
-	p5.draw = () => {
-		// DEMO: Let the circle instances draw themselves
-		myCircles.forEach(circle => circle.draw());
-	};
+	p5.mouseClicked = () => {
+		if (p5.mouseButton == p5.LEFT) {
+		  delaunayTriangulation.addPoint(p5.mouseX, p5.mouseY);
+		}
+	  }
 };
 
 new P5(sketch);
