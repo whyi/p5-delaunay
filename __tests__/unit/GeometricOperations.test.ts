@@ -110,7 +110,7 @@ describe('GeometricOperations', () => {
             const v1 = new p5.Vector(0,0,0);
             const v2 = new p5.Vector(1,1,1);
             const result = GeometricOperations.midVector(v1, v2);
-            expect(result).toBe(new p5.Vector((v1.x+v2.x)/2, (v1.y+v2.y)/2));
+            expect(result).toStrictEqual(new p5.Vector((v1.x+v2.x)/2, (v1.y+v2.y)/2));
         })
     })
 });

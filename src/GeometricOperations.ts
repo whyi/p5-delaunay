@@ -37,4 +37,8 @@ export abstract class GeometricOperations {
 
         return new P5.Vector(S.x+tangent.x,S.y+tangent.y);
     }
+
+    public static midVector(A: P5.Vector, B: P5.Vector): P5.Vector {
+        return new P5.Vector((A.x + B.x)/2, (A.y + B.y)/2);
+    }
 }
