@@ -35,9 +35,9 @@ describe('GeometricOperations', () => {
                     \
             A--------B
             */
-            const pointA = new p5.Vector(0,0,0);
-            const pointB = new p5.Vector(1,0,0);
-            const pointC = new p5.Vector(0.75,0.75,0);
+            const pointA = new p5.Vector(0,0);
+            const pointB = new p5.Vector(1,0);
+            const pointC = new p5.Vector(0.75,0.75);
             const result = GeometricOperations.isLeftTurn(pointA, pointB, pointC);
             expect(result).toBe(true);
         })
@@ -49,11 +49,29 @@ describe('GeometricOperations', () => {
                    /
                   C
             */
-            const pointA = new p5.Vector(0,0,0);
-            const pointB = new p5.Vector(1,0,0);
-            const pointC = new p5.Vector(0.75,-0.75,0);
+            const pointA = new p5.Vector(0,0);
+            const pointB = new p5.Vector(1,0);
+            const pointC = new p5.Vector(0.75,-0.75);
             const result = GeometricOperations.isLeftTurn(pointA, pointB, pointC);
             expect(result).toBe(false);
+        })
+    })
+
+    describe("intersection", () => {
+        it ("returns intersecting point of the 4 vectors(S, SE, Q, QE)", () => {
+            /*
+                   QE
+                   |
+            S------+-----SE
+                   |
+                   Q
+            */
+            const vecQ = new p5.Vector(5,5);
+            const vecS = new p5.Vector(0,0);
+            const vecSE = new p5.Vector(0,10);
+            const vecQE = new p5.Vector(5,-5);
+            const result = GeometricOperations.intersection(vecQ, vecS, vecSE, vecQE);
+            expect(result).toBe(new p5.Vector(0,5));
         })
     })
 });
