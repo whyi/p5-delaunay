@@ -24,7 +24,7 @@ function InitTwoTriangles()
     | \|
     3--2
     */
-    twoTriangles = new DelaunayTriangulation()
+    twoTriangles = new DelaunayTriangulation(1)
     twoTriangles.vertices = [
         new p5.Vector(0,0),
         new p5.Vector(0,1),
@@ -85,13 +85,13 @@ describe('DelaunayTriangulation', () => {
     it ("buid O Table and returns if opposite of given corner is a boundary", () => {
       twoTriangles.flipCorner(0);
       expect(flipCornerSpy).toBeCalledTimes(1);
-      expect(buildOTableSpy).toBeCalledTimes(1);
+      expect(buildOTableSpy).toBeCalledTimes(2);
     })
 
     it ("does not process if given corner already satisfy Delaunay property", () => {
       twoTriangles.flipCorner(4);
       expect(flipCornerSpy).toBeCalledTimes(1);
-      expect(buildOTableSpy).toBeCalledTimes(1);
+      expect(buildOTableSpy).toBeCalledTimes(2);
       expect(isDelaunayMock).toBeCalledTimes(1);
     })
   })

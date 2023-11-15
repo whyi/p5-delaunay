@@ -3,6 +3,29 @@ import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
 
 export default class DelaunayTriangulation extends Mesh2D {
+	private __circumcenters: p5.Vector[] = [];
+	private __circumcircleRadius: number[] = [];
+    public hasCircumcircles: boolean = false;
+
+    constructor(screenSize: number) {
+        super();
+        this.initTriangles(screenSize);
+      }
+      
+    private initTriangles(screenSize: number) {
+        this.vertices = [
+            new p5.Vector(0,0),
+            new p5.Vector(0,screenSize),
+            new p5.Vector(screenSize,screenSize),
+            new p5.Vector(screenSize,0)
+        ];
+        this.numberOfVertices = 4;
+        this.corners = [0,1,2,2,3,0];
+        this.numberOfTriangles = 2;
+        this.numberOfCorners = 6;
+        this.buildOTable();
+    }
+
     public addPoint(x: number, y: number): void {
         const newPoint = new p5.Vector(x, y);
         this.vertices.push(newPoint);
@@ -30,11 +53,9 @@ export default class DelaunayTriangulation extends Mesh2D {
             const dirtyCorner2 = this.numberOfTriangles*3+2;
             const dirtyCorner3 = this.numberOfTriangles*3+5;
 
-            const dirtyCorners: number[] = [dirtyCorner1, dirtyCorner2, dirtyCorner3];
-      
             this.numberOfTriangles += 2;
             this.numberOfCorners += 6;
-            this.fixMesh(dirtyCorners);
+            this.fixMesh([dirtyCorner1, dirtyCorner2, dirtyCorner3]);
             break;
           }
         }
