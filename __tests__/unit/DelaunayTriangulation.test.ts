@@ -5,6 +5,7 @@
 import {expect} from '@jest/globals';
 import p5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
+import { BOUNDARY } from '../../src/Mesh2D';
 
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 
@@ -35,6 +36,7 @@ beforeEach(() => {
 
 afterEach(() => {
     InitTwoTriangles();
+    flipCornerSpy.mockClear();
 })
 
 describe('DelaunayTriangulation', () => {
@@ -66,4 +68,10 @@ describe('DelaunayTriangulation', () => {
     })
   })
 
+  describe("flipCorner", () => {
+    it ("immediately returns with reach a boundary", () => {
+      twoTriangles.flipCorner(BOUNDARY);
+      expect(flipCornerSpy).toBeCalledTimes(1);
+    })
+  })
 });
