@@ -5,14 +5,16 @@
   "scripts": {
     "start": "parcel index.html --open",
     "build": "parcel build index.html --public-url ./",
+    "tsc": "tsc --build tsconfig.json",
+    "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "tsc": "tsc --build tsconfig.json",
-    "watch": "tsc --watch"
+    "make-badges": "istanbul-badges-readme"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.2",
     "@types/jest": "^29.5.8",
+    "istanbul-badges-readme": "^1.8.5",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "parcel": "^2.10.2",
