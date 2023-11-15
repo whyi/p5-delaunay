@@ -46,13 +46,13 @@ describe('DelaunayTriangulation', () => {
 
   describe("isInTriangle", () => {
     it ("returns true when given point is in triangle", () => {
-      var newPoint = new Vector(0.1, 0.1);
-      expect(twoTriangles.isInTriangle(1, newPoint)).toBe(true);
+      var newPoint = new Vector(0.8, 0.1);
+      expect(twoTriangles.isInTriangle(0, newPoint)).toBe(false);
     })
 
     it ("returns false when given point is not in triangle", () => {
-      var newPoint = new Vector(0.1, 0.1);
-      expect(twoTriangles.isInTriangle(0, newPoint)).toBe(false);
+      var newPoint = new Vector(0.8, 0.1);
+      expect(twoTriangles.isInTriangle(1, newPoint)).toBe(true);
     })
   })
 
