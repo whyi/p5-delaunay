@@ -9,6 +9,11 @@ import { BOUNDARY } from '../../src/Mesh2D';
 
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
+const isDelaunayMock = jest
+.spyOn(DelaunayTriangulation.prototype, 'isDelaunay')
+.mockImplementation((cornerId: number) => {
+  return true;
+});
 
 let twoTriangles: DelaunayTriangulation;
 function InitTwoTriangles()
@@ -39,6 +44,7 @@ afterEach(() => {
     InitTwoTriangles();
     flipCornerSpy.mockClear();
     buildOTableSpy.mockClear();
+    isDelaunayMock.mockClear();
 })
 
 describe('DelaunayTriangulation', () => {
@@ -80,6 +86,13 @@ describe('DelaunayTriangulation', () => {
       twoTriangles.flipCorner(0);
       expect(flipCornerSpy).toBeCalledTimes(1);
       expect(buildOTableSpy).toBeCalledTimes(1);
+    })
+
+    it ("does not process if given corner already satisfy Delaunay property", () => {
+      twoTriangles.flipCorner(0);
+      expect(flipCornerSpy).toBeCalledTimes(1);
+      expect(buildOTableSpy).toBeCalledTimes(1);
+      expect(isDelaunayMock).toBeCalledTimes(1);
     })
   })
 });

@@ -42,4 +42,8 @@ export default class DelaunayTriangulation extends Mesh2D {
         if (this.getOppositeCornerId(cornerId) == BOUNDARY)
             return;
     }
+
+    public isDelaunay(cornerId: number): boolean {
+        return false;
+    }
 }
