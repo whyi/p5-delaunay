@@ -77,7 +77,7 @@ describe('DelaunayTriangulation', () => {
   })
 
   describe("flipCorner", () => {
-    it ("immediately returns with reach a boundary", () => {
+    it ("immediately returns when given a boundary", () => {
       twoTriangles.flipCorner(BOUNDARY);
       expect(flipCornerSpy).toBeCalledTimes(1);
     })
@@ -89,7 +89,7 @@ describe('DelaunayTriangulation', () => {
     })
 
     it ("does not process if given corner already satisfy Delaunay property", () => {
-      twoTriangles.flipCorner(0);
+      twoTriangles.flipCorner(4);
       expect(flipCornerSpy).toBeCalledTimes(1);
       expect(buildOTableSpy).toBeCalledTimes(1);
       expect(isDelaunayMock).toBeCalledTimes(1);
