@@ -7,6 +7,37 @@ export default class DelaunayTriangulation extends Mesh2D {
         const newPoint = new p5.Vector(x, y);
         this.vertices.push(newPoint);
         ++this.numberOfVertices;
+
+        let currentNumberOfTriangles = this.numberOfTriangles;
+
+        for (let triangleIndex = 0; triangleIndex < currentNumberOfTriangles; ++triangleIndex) {
+          if (this.isInTriangle(triangleIndex, newPoint)) {
+            const A = triangleIndex*3;
+            const B = A+1;
+            const C = A+2;
+      
+            this.corners.push(this.corners[B]);
+            this.corners.push(this.corners[C]);
+            this.corners.push(this.numberOfVertices-1);
+      
+            this.corners.push(this.corners[C]);
+            this.corners.push(this.corners[A]);
+            this.corners.push(this.numberOfVertices-1);
+      
+            this.corners[C] = this.numberOfVertices-1;
+            
+            const dirtyCorner1 = C;
+            const dirtyCorner2 = this.numberOfTriangles*3+2;
+            const dirtyCorner3 = this.numberOfTriangles*3+5;
+
+            const dirtyCorners: number[] = [dirtyCorner1, dirtyCorner2, dirtyCorner3];
+      
+            this.numberOfTriangles += 2;
+            this.numberOfCorners += 6;
+            this.fixMesh(dirtyCorners);
+            break;
+          }
+        }
     }
 
     public isInTriangle(triangleId: number, point: p5.Vector): boolean {
