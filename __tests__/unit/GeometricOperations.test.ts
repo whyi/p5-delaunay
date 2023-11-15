@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import {expect, jest, test} from '@jest/globals';
-import p5, { Vector } from "p5";
+import {expect} from '@jest/globals';
+import p5 from "p5";
 import { GeometricOperations } from '../../src/GeometricOperations';
 
 describe('GeometricOperations', () => {
@@ -118,7 +118,7 @@ describe('GeometricOperations', () => {
         it ("return circumcenter of the triangle ABC's circumcircle", () => {
             /*
             https://www.wolframalpha.com/input?i=circumcenter+of+a+triangle+0%2C0+0%2C1+0.5%2C1
-            
+
                 A
                 | \ _____<<<here's the circumcenter
                 |  \
