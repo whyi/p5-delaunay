@@ -24,7 +24,7 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
 
     public fixMesh(dirtyCorners: number[]): void {
-        super.buildOTable();
+        this.buildOTable();
   
         while (dirtyCorners.length > 0) {
           this.flipCorner(dirtyCorners[0]);
@@ -34,6 +34,12 @@ export default class DelaunayTriangulation extends Mesh2D {
 
     public flipCorner(cornerId: number): void {
         if (cornerId == BOUNDARY)
+            return;
+
+        this.buildOTable();    
+
+        // boundary, do nothing..
+        if (this.getOppositeCornerId(cornerId) == BOUNDARY)
             return;
     }
 }
