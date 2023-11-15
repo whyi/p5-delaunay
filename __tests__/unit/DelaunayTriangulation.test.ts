@@ -6,6 +6,8 @@ import {expect} from '@jest/globals';
 import p5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 
+const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
+
 let twoTriangles: DelaunayTriangulation;
 function InitTwoTriangles()
 {
@@ -58,15 +60,9 @@ describe('DelaunayTriangulation', () => {
 
   describe("fixMesh", () => {
     it ("recursively flipCorners", () => {
-      const flipCornerMock = jest
-      .spyOn(DelaunayTriangulation.prototype, 'flipCorner')
-      .mockImplementation((dirtyCorners: number[]) => {
-        console.log('mocked function');
-      });
-
       const dirtyCorners:number[] = [0,1,2];
       twoTriangles.fixMesh(dirtyCorners);
-      expect(flipCornerMock).toHaveBeenCalledTimes(dirtyCorners.length);
+      expect(flipCornerSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
     })
   })
 
