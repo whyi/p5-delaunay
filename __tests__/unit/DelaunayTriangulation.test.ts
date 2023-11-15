@@ -3,7 +3,7 @@
  */
 
 import {expect} from '@jest/globals';
-import p5 from "p5";
+import p5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 
 let twoTriangles: DelaunayTriangulation;
@@ -37,21 +37,22 @@ afterEach(() => {
 
 describe('DelaunayTriangulation', () => {
   describe("addPoint", () => {
-    it ("creates a new point and add it to gemoetry table", () => {
-      const newPoint = new p5.Vector(0.1, 0.1);
-      twoTriangles.addPoint(newPoint);
-      expect(twoTriangles.vertices[-1]).toBe(newPoint);
+    it ("creates a new point from x,y coordiante and add it to gemoetry table", () => {
+      twoTriangles.addPoint(0.1, 0.1);
+      expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new p5.Vector(0.1, 0.1));
       expect(twoTriangles.numberOfVertices).toBe(5);
     })
   })
 
   describe("isInTriangle", () => {
     it ("returns true when given point is in triangle", () => {
-
+      var newPoint = new Vector(0.1, 0.1);
+      expect(twoTriangles.isInTriangle(1, newPoint)).toBe(true);
     })
 
     it ("returns false when given point is not in triangle", () => {
-
+      var newPoint = new Vector(0.1, 0.1);
+      expect(twoTriangles.isInTriangle(0, newPoint)).toBe(false);
     })
   })
 
