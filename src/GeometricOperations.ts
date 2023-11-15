@@ -30,7 +30,7 @@ export abstract class GeometricOperations {
 
         if (!isFinite(t)) {
             // return an undefined vector
-            return new P5.Vector();
+            return new P5.Vector(undefined, undefined);
         }
 
         tangent.mult(t);
