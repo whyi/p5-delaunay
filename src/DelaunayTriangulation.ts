@@ -1,5 +1,5 @@
 import p5 from "p5";
-import Mesh2D from "./Mesh2D";
+import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
 
 export default class DelaunayTriangulation extends Mesh2D {
@@ -33,6 +33,7 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
 
     public flipCorner(cornerId: number): void {
-        console.log("flip");
+        if (cornerId == BOUNDARY)
+            return;
     }
 }
