@@ -98,27 +98,29 @@ describe('DelaunayTriangulation', () => {
   })
 
   describe("isDelaunay", () => {
-    it ("returns true if opposite corner is outside of circumcircle's radius", () => {
+    it ("returns false if opposite corner is inside of circumcircle's radius", () => {
       isDelaunayMock.mockRestore();
-      expect(twoTriangles.isDelaunay(1)).toBe(true);
+      twoTriangles.buildOTable();
+      expect(twoTriangles.isDelaunay(4)).toBe(false);
     })
     
-    it ("returns false if opposite corner is inside of circumcircle's radius", () => {
+    it ("returns true if opposite corner is outside of circumcircle's radius", () => {
       /*
       Modify initial mock to make a very skewed triangles
-      0--1          0------------------1
-      |\ |   =>     |\________________ |
+      0--1          0--1
+      |\ |   =>     |\_______________ 
       | \|          |                 \|
       3--2          3------------------2
       */
       twoTriangles.vertices = [
           new p5.Vector(0,0),
           new p5.Vector(0,1),
-          new p5.Vector(1000,1),
+          new p5.Vector(1,1),
           new p5.Vector(1000,0)
       ];
       isDelaunayMock.mockRestore();
-      expect(twoTriangles.isDelaunay(1)).toBe(false);
+      twoTriangles.buildOTable();
+      expect(twoTriangles.isDelaunay(1)).toBe(true);
     })
   })
 });

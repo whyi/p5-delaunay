@@ -45,9 +45,27 @@ export default class DelaunayTriangulation extends Mesh2D {
         // already satisfy Delaunay property.
         if (this.isDelaunay(cornerId))
             return;
+
+        const opposite = this.getOppositeCornerId(cornerId);
+    
+        this.corners[this.getNextCornerId(cornerId)] = this.corners[opposite];
+        this.corners[this.getNextCornerId(opposite)] = this.corners[cornerId];
+    
+        this.buildOTable();
+        this.flipCorner(cornerId);
+        this.buildOTable();
+        this.flipCorner(this.getNextCornerId(opposite));
     }
 
     public isDelaunay(cornerId: number): boolean {
-        return false;
+        const pointA = this.getGeometry(cornerId);
+        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
+        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
+        
+        const circumcenter = GeometricOperations.circumcenter(pointA, pointB, pointC);
+        const radius = pointA.dist(circumcenter);
+        const oppositePoint = this.getGeometry(this.getOppositeCornerId(cornerId));
+
+        return oppositePoint.dist(circumcenter) > radius;
     }
 }
