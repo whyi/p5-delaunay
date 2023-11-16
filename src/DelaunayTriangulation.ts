@@ -92,7 +92,11 @@ export default class DelaunayTriangulation extends Mesh2D {
     public isInTriangle(triangleId: number, point: P5.Vector): boolean {
         const cornerId = triangleId*3;
         const triangle = this.getTriangleVerticesFromCornerId(cornerId);
-        
+
+        const temp = triangle.b;
+        triangle.b = triangle.c;
+        triangle.c = temp;
+
         if (GeometricOperations.isLeftTurn(triangle.a,triangle.b,point) == GeometricOperations.isLeftTurn(triangle.b,triangle.c,point) &&
             GeometricOperations.isLeftTurn(triangle.a,triangle.b,point) == GeometricOperations.isLeftTurn(triangle.c,triangle.a,point)) {
           return true;
