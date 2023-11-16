@@ -18,8 +18,8 @@
 | ```npm run build```       | Build the project and output to the ```dist``` directory.                                       |
 | ```npm tsc```             | run ```tsc``` to compile all typescripts and place .js files to the ```dist``` directory.       |
 | ```npm watch```           | run ```tsc``` in watch mode, recommend pair it with the command ```npm run test:watch``` below. |
-| ```npm run test```        | Run all tests under the ```__tests___``` directory.                                             |
-| ```npm run test:watch```  | Run all tests under the ```__tests___``` directory in watch mode.                               |
+| ```npm run test```        | Run all tests under the ```__tests__``` directory.                                             |
+| ```npm run test:watch```  | Run all tests under the ```__tests__``` directory in watch mode.                               |
 | ```npm run make-badges``` | Update badges from the jest code coverage report.                                               |
 
 ## Issues
