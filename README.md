@@ -5,7 +5,8 @@
 | ![Statements](https://img.shields.io/badge/statements-98.76%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-91.66%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.73%25-brightgreen.svg?style=flat) |
 
 ## Introduction
-A Typescript + p5.js port of [Incremental Delaunay Triangulation what was built with processing.js](https://github.com/whyi/Delaunay)
+* A Typescript + [p5.js](https://github.com/processing/p5.js) port of [Incremental Delaunay Triangulation what was built with processing.js](https://github.com/whyi/Delaunay)
+* Live demo: https://www.whyi.net/
 
 ## How to
 * Prerequisite: Clone the repository then run ```npm install```.
@@ -21,5 +22,9 @@ A Typescript + p5.js port of [Incremental Delaunay Triangulation what was built 
 | ```npm run test:watch```  | Run all tests under the ```__tests___``` directory in watch mode.                               |
 | ```npm run make-badges``` | Update badges from the jest code coverage report.                                               |
 
+## Issues
+* Please use the [Issues](https://github.com/whyi/p5-delaunay/issues) tab to report bugs and suggestions.
+
 ## Dependencies
-* All dependencies are up-to-date versions as of ```Nov 15 2023```.
+* All build dependencies are up-to-date versions as of ```Nov 15 2023```.
+* Runtime dependency: the latest version of [p5.js](https://github.com/processing/p5.js)
