@@ -47,14 +47,27 @@ describe('DelaunayTriangulation', () => {
     })
   })
 
+  describe("isDuplicated", () => {
+    it ("returns true when point is duplicated", () => {
+      expect(twoTriangles.isDuplicated(0, 0)).toBeTruthy();
+    })
+
+    it ("returns true when point overlaps with any other point within tolerance", () => {
+      expect(twoTriangles.isDuplicated(DelaunayTriangulation.TOLERANCE/2, DelaunayTriangulation.TOLERANCE/2)).toBeTruthy();
+    })
+
+    it ("returns false when point doesn't overlap with any points within tolerance", () => {
+      expect(twoTriangles.isDuplicated(0.1, 0.1)).toBe(false);
+    })
+
   describe("isInTriangle", () => {
     it ("returns true when given point is in triangle", () => {
-      var newPoint = new Vector(0.8, 0.1);
+      const newPoint = new Vector(0.8, 0.1);
       expect(twoTriangles.isInTriangle(0, newPoint)).toBe(false);
     })
 
     it ("returns false when given point is not in triangle", () => {
-      var newPoint = new Vector(0.8, 0.1);
+      const newPoint = new Vector(0.8, 0.1);
       expect(twoTriangles.isInTriangle(1, newPoint)).toBe(true);
     })
   })
