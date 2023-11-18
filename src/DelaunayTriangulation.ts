@@ -13,6 +13,7 @@ export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
+    public static TOLERANCE: number = 1;
 
     constructor(screenSize: number, p5Instance?: P5) {
         super();
@@ -20,7 +21,7 @@ export default class DelaunayTriangulation extends Mesh2D {
         if (p5Instance) {
             this.__P5Instance = p5Instance;
         }
-        
+        DelaunayTriangulation.TOLERANCE = Number.EPSILON * screenSize;
         this.initTriangles(screenSize);
     }
       
@@ -52,10 +53,20 @@ export default class DelaunayTriangulation extends Mesh2D {
         }
     
         this.hasCircumcircles = true;
-      }
+    }
+
+    public isDuplicated(newPoint: P5.Vector): boolean {
+        // refactor to use quadtree later on.
+        return this.vertices.some((p) => p.dist(newPoint) <= DelaunayTriangulation.TOLERANCE);
+    }
 
     public addPoint(x: number, y: number): void {
         const newPoint = new P5.Vector(x, y);
+
+        if (this.isDuplicated(newPoint)) {
+            return;
+        }
+
         this.vertices.push(newPoint);
         ++this.numberOfVertices;
 
@@ -148,14 +159,6 @@ export default class DelaunayTriangulation extends Mesh2D {
         return oppositePoint.dist(circumcenter) > radius;
     }
 
-    private getTriangleVerticesFromCornerId(cornerId: number): Triangle {
-        const pointA = this.getGeometry(cornerId);
-        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
-        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
-
-        return {a: pointA, b: pointB, c: pointC};
-    }
-
     /* istanbul ignore next */ 
     public drawTriangles(): void {
         if (!this.__P5Instance)
@@ -204,5 +207,13 @@ export default class DelaunayTriangulation extends Mesh2D {
             this.__P5Instance.stroke(0,0,0);
             this.__P5Instance.noFill();
         }
+    }
+
+    private getTriangleVerticesFromCornerId(cornerId: number): Triangle {
+        const pointA = this.getGeometry(cornerId);
+        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
+        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
+
+        return {a: pointA, b: pointB, c: pointC};
     }
 }
