@@ -13,6 +13,7 @@ export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
+    public static readonly TOLERANCE: number = Number.MIN_SAFE_INTEGER*2;
 
     constructor(screenSize: number, p5Instance?: P5) {
         super();
@@ -52,7 +53,11 @@ export default class DelaunayTriangulation extends Mesh2D {
         }
     
         this.hasCircumcircles = true;
-      }
+    }
+
+    public isDuplicated(x: number, y: number): boolean {
+        return true;
+    }
 
     public addPoint(x: number, y: number): void {
         const newPoint = new P5.Vector(x, y);
