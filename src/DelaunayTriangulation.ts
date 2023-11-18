@@ -13,7 +13,7 @@ export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
-    public static readonly TOLERANCE: number = Number.MIN_SAFE_INTEGER*2;
+    public static readonly TOLERANCE: number = Math.abs(Number.MIN_VALUE*2);
 
     constructor(screenSize: number, p5Instance?: P5) {
         super();
@@ -55,8 +55,9 @@ export default class DelaunayTriangulation extends Mesh2D {
         this.hasCircumcircles = true;
     }
 
-    public isDuplicated(x: number, y: number): boolean {
-        return true;
+    public isDuplicated(newPoint: P5.Vector): boolean {
+        // refactor to use quadtree later on.
+        return this.vertices.some((p) => p.dist(newPoint) <= DelaunayTriangulation.TOLERANCE);
     }
 
     public addPoint(x: number, y: number): void {

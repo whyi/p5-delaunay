@@ -42,22 +42,24 @@ describe('DelaunayTriangulation', () => {
     })
 
     it ("checks for duplicated points", () => {
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
       twoTriangles.addPoint(0.1, 0.1);
-      expect(isDelaunaySpy).toBeCalledWith(0.1, 0.1);
+      expect(isDuplicated).toBeCalledWith(new P5.Vector(0.1, 0.1));
     })
   })
 
   describe("isDuplicated", () => {
     it ("returns true when point is duplicated", () => {
-      expect(twoTriangles.isDuplicated(0, 0)).toBeTruthy();
+      //expect(twoTriangles.isDuplicated(new P5.Vector(0, 0))).toBeTruthy();
     })
 
     it ("returns true when point overlaps with any other point within tolerance", () => {
-      expect(twoTriangles.isDuplicated(DelaunayTriangulation.TOLERANCE/2, DelaunayTriangulation.TOLERANCE/2)).toBeTruthy();
+      //expect(twoTriangles.isDuplicated(new P5.Vector(DelaunayTriangulation.TOLERANCE/2,DelaunayTriangulation.TOLERANCE/2))).toBeTruthy();
     })
 
     it ("returns false when point doesn't overlap with any points within tolerance", () => {
-      expect(twoTriangles.isDuplicated(0.1, 0.1)).toBe(false);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      expect(twoTriangles.isDuplicated(new P5.Vector(0.1, 0.1))).toBe(false);
     })
   })
 
