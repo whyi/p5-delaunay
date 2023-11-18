@@ -26,12 +26,15 @@ describe('DelaunayTriangulation', () => {
     afterEach(() => clearMocks());
 
     it ("creates a new point from x,y coordiante and add it to geometry table", () => {
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
       twoTriangles.addPoint(0.1, 0.1);
       expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new P5.Vector(0.1, 0.1));
       expect(twoTriangles.numberOfVertices).toBe(5);
     })
 
     it ("newly added point creates 2 more triangles by splitting the existing one into 3", () => {
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+
       const previousNumberOfCorners = twoTriangles.numberOfCorners;
       const previousNumberOfTriangles = twoTriangles.numberOfTriangles;
 
@@ -46,15 +49,27 @@ describe('DelaunayTriangulation', () => {
       twoTriangles.addPoint(0.1, 0.1);
       expect(isDuplicated).toBeCalledWith(new P5.Vector(0.1, 0.1));
     })
+
+    it ("Does not add when the input point is duplicated", () => {
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+
+      const previousNumberOfCorners = twoTriangles.numberOfCorners;
+      const previousNumberOfTriangles = twoTriangles.numberOfTriangles;
+
+      twoTriangles.addPoint(1, 1);
+      expect(isDuplicated).toBeCalledWith(new P5.Vector(1, 1));
+      expect(twoTriangles.numberOfCorners).toBe(previousNumberOfCorners);
+      expect(twoTriangles.numberOfTriangles).toBe(previousNumberOfTriangles);
+    })
   })
 
   describe("isDuplicated", () => {
     it ("returns true when point is duplicated", () => {
-      //expect(twoTriangles.isDuplicated(new P5.Vector(0, 0))).toBeTruthy();
+      expect(twoTriangles.isDuplicated(new P5.Vector(0, 0))).toBeTruthy();
     })
 
     it ("returns true when point overlaps with any other point within tolerance", () => {
-      //expect(twoTriangles.isDuplicated(new P5.Vector(DelaunayTriangulation.TOLERANCE/2,DelaunayTriangulation.TOLERANCE/2))).toBeTruthy();
+      expect(twoTriangles.isDuplicated(new P5.Vector(DelaunayTriangulation.TOLERANCE/2,DelaunayTriangulation.TOLERANCE/2))).toBeTruthy();
     })
 
     it ("returns false when point doesn't overlap with any points within tolerance", () => {

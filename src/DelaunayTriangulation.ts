@@ -62,6 +62,11 @@ export default class DelaunayTriangulation extends Mesh2D {
 
     public addPoint(x: number, y: number): void {
         const newPoint = new P5.Vector(x, y);
+
+        if (this.isDuplicated(newPoint)) {
+            return;
+        }
+
         this.vertices.push(newPoint);
         ++this.numberOfVertices;
 
