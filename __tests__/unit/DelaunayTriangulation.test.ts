@@ -11,16 +11,21 @@ let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
 const isDelaunaySpy = jest.spyOn(DelaunayTriangulation.prototype, 'isDelaunay');
+const isDuplicated = jest.spyOn(DelaunayTriangulation.prototype, 'isDuplicated');
 
 function clearMocks() {
   flipCornerSpy.mockClear();
   buildOTableSpy.mockClear();
   isDelaunaySpy.mockClear();
+  isDuplicated.mockClear();
 }
 
 describe('DelaunayTriangulation', () => {
+  beforeEach(() => clearMocks());
+  afterEach(() => clearMocks());
+
   describe("addPoint", () => {
-    it ("creates a new point from x,y coordiante and add it to gemoetry table", () => {
+    it ("creates a new point from x,y coordiante and add it to geometry table", () => {
       twoTriangles.addPoint(0.1, 0.1);
       expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new P5.Vector(0.1, 0.1));
       expect(twoTriangles.numberOfVertices).toBe(5);
@@ -34,6 +39,11 @@ describe('DelaunayTriangulation', () => {
 
       expect(twoTriangles.numberOfCorners).toBe(previousNumberOfCorners+6);
       expect(twoTriangles.numberOfTriangles).toBe(previousNumberOfTriangles+2);
+    })
+
+    it ("checks for duplicated points", () => {
+      twoTriangles.addPoint(0.1, 0.1);
+      expect(isDelaunaySpy).toBeCalledWith(0.1, 0.1);
     })
   })
 
