@@ -21,10 +21,10 @@ function clearMocks() {
 }
 
 describe('DelaunayTriangulation', () => {
-  beforeEach(() => clearMocks());
-  afterEach(() => clearMocks());
-
   describe("addPoint", () => {
+    beforeEach(() => clearMocks());
+    afterEach(() => clearMocks());
+
     it ("creates a new point from x,y coordiante and add it to geometry table", () => {
       twoTriangles.addPoint(0.1, 0.1);
       expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new P5.Vector(0.1, 0.1));
@@ -59,6 +59,7 @@ describe('DelaunayTriangulation', () => {
     it ("returns false when point doesn't overlap with any points within tolerance", () => {
       expect(twoTriangles.isDuplicated(0.1, 0.1)).toBe(false);
     })
+  })
 
   describe("isInTriangle", () => {
     it ("returns true when given point is in triangle", () => {

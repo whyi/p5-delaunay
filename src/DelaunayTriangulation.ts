@@ -148,14 +148,6 @@ export default class DelaunayTriangulation extends Mesh2D {
         return oppositePoint.dist(circumcenter) > radius;
     }
 
-    private getTriangleVerticesFromCornerId(cornerId: number): Triangle {
-        const pointA = this.getGeometry(cornerId);
-        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
-        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
-
-        return {a: pointA, b: pointB, c: pointC};
-    }
-
     /* istanbul ignore next */ 
     public drawTriangles(): void {
         if (!this.__P5Instance)
@@ -204,5 +196,13 @@ export default class DelaunayTriangulation extends Mesh2D {
             this.__P5Instance.stroke(0,0,0);
             this.__P5Instance.noFill();
         }
+    }
+
+    private getTriangleVerticesFromCornerId(cornerId: number): Triangle {
+        const pointA = this.getGeometry(cornerId);
+        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
+        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
+
+        return {a: pointA, b: pointB, c: pointC};
     }
 }
