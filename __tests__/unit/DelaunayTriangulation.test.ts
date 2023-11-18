@@ -75,7 +75,9 @@ describe('DelaunayTriangulation', () => {
 
     it ("returns false when point doesn't overlap with any points within tolerance", () => {
       let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
-      expect(twoTriangles.isDuplicated(new P5.Vector(0.1, 0.1))).toBe(false);
+      expect(twoTriangles.isDuplicated(new P5.Vector(
+          DelaunayTriangulation.TOLERANCE+DelaunayTriangulation.TOLERANCE,
+          DelaunayTriangulation.TOLERANCE+DelaunayTriangulation.TOLERANCE))).toBe(false);
     })
   })
 

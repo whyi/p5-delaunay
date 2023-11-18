@@ -13,7 +13,7 @@ export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
-    public static readonly TOLERANCE: number = 1;
+    public static TOLERANCE: number = 1;
 
     constructor(screenSize: number, p5Instance?: P5) {
         super();
@@ -21,7 +21,7 @@ export default class DelaunayTriangulation extends Mesh2D {
         if (p5Instance) {
             this.__P5Instance = p5Instance;
         }
-        
+        DelaunayTriangulation.TOLERANCE = Number.EPSILON * screenSize;
         this.initTriangles(screenSize);
     }
       
