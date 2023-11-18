@@ -57,6 +57,7 @@ describe('DelaunayTriangulation', () => {
       const previousNumberOfTriangles = twoTriangles.numberOfTriangles;
 
       twoTriangles.addPoint(1, 1);
+      
       expect(isDuplicated).toBeCalledWith(new P5.Vector(1, 1));
       expect(twoTriangles.numberOfCorners).toBe(previousNumberOfCorners);
       expect(twoTriangles.numberOfTriangles).toBe(previousNumberOfTriangles);
