@@ -1,5 +1,6 @@
 import P5 from "p5";
 import "./styles.scss";
+import $ = require("jquery");
 
 import DelaunayTriangulation from "./DelaunayTriangulation";
 
@@ -15,15 +16,16 @@ const sketch = (p5: P5) => {
 	}
 
 	p5.setup = () => {
-		const mySize = Math.min(p5.windowWidth, p5.windowHeight)-80;
+		const mySize = Math.min(p5.windowWidth, p5.windowHeight)-160;
 		const canvas = p5.createCanvas(mySize, mySize);
 		canvas.parent("sketch");
 
 		delaunayTriangulation = new DelaunayTriangulation(mySize, p5);
 
-		const button = p5.createButton('Click to toggle Circumcircles');
-		button.position(p5.windowWidth/2-120, 60);
-		button.mousePressed(toggleCircumcircles);
+		$('.modal-dialog').css({ 'position':'absolute', 'left' : p5.windowWidth/2-mySize/2});
+		$('.modal-content').css({'width':mySize+2 });
+		$('.modal-body').css({'padding':0 });
+		$('#flexCheckChecked').on("click", toggleCircumcircles);
 	};
 
 	p5.draw = () => {
