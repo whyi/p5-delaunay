@@ -10,9 +10,11 @@ interface Triangle {
 
 export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcenters: P5.Vector[] = [];
+    private __voronoi: P5.Vector[] = [];
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
+    public hasVoronoi: boolean = false;
     public static TOLERANCE: number = 1;
 
     constructor(screenSize: number, p5Instance?: P5) {
@@ -53,6 +55,14 @@ export default class DelaunayTriangulation extends Mesh2D {
         }
     
         this.hasCircumcircles = true;
+    }
+
+    public computeVoronoi(): void {
+        this.hasVoronoi = false;
+    
+        this.__voronoi = [];
+   
+        this.hasVoronoi = true;
     }
 
     public isDuplicated(newPoint: P5.Vector): boolean {
