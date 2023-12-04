@@ -181,8 +181,8 @@ export default class DelaunayTriangulation extends Mesh2D {
         }
       }
       
-      /* istanbul ignore next */ 
-      public drawCircumcircles(): void {
+    /* istanbul ignore next */ 
+    public drawCircumcircles(): void {
         if (!this.__P5Instance)
             return;
 
