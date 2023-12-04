@@ -196,4 +196,14 @@ describe('DelaunayTriangulation', () => {
       expect(twoTriangles.hasCircumcircles).toBe(true);
     })
   })
+
+  describe("computeVoronoi", () => {
+    it ("calculates Voronoi regions", () => {
+      twoTriangles = new DelaunayTriangulation(1)
+
+      expect(twoTriangles.hasVoronoi).toBe(false);
+      twoTriangles.computeVoronoi();
+      expect(twoTriangles.hasVoronoi).toBe(true);
+    })
+  })
 });
