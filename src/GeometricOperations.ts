@@ -1,4 +1,5 @@
 import P5 from "p5";
+import Line from "./Line";
 
 export default abstract class GeometricOperations {
     public static cross2D(U: P5.Vector, V: P5.Vector): number {
@@ -18,7 +19,7 @@ export default abstract class GeometricOperations {
         const normalVector = new P5.Vector(QE.x-Q.x, QE.y-Q.y);
         normalVector.normalize();
 
-        this.leftTurn(normalVector);
+        GeometricOperations.leftTurn(normalVector);
 
         const QS = new P5.Vector(S.x-Q.x, S.y-Q.y);
         const QSDotNormal = QS.dot(normalVector);
@@ -40,31 +41,49 @@ export default abstract class GeometricOperations {
     }
 
     public static circumcenter(A: P5.Vector, B: P5.Vector, C: P5.Vector): P5.Vector {
-        const midAB = GeometricOperations.midVector(A,B);
-        const AB = new P5.Vector(B.x-A.x, B.y-A.y);
-        this.leftTurn(AB);
-        AB.normalize();
-        AB.mult(-1);
-      
-        const midBC = GeometricOperations.midVector(B,C);
-        const BC = new P5.Vector(C.x-B.x, C.y-B.y);
-        this.leftTurn(BC);
-        BC.normalize();
-        BC.mult(-1);
-      
-        const fact = 100;
-      
-        const AA = new P5.Vector(midAB.x+AB.x*fact, midAB.y+AB.y*fact);
-        const BB = new P5.Vector(midAB.x-AB.x*fact, midAB.y-AB.y*fact);
-        const CC = new P5.Vector(midBC.x+BC.x*fact, midBC.y+BC.y*fact);
-        const DD = new P5.Vector(midBC.x-BC.x*fact, midBC.y-BC.y*fact);
+        const midAB = GeometricOperations.midVector(A, B);
+        const vecAB = GeometricOperations.makeLeftTurnedVectorFrom(A, B);
+        const line1 = GeometricOperations.makeLineCoordinatesFrom(midAB, vecAB);
 
-        return GeometricOperations.intersection(AA, BB, CC, DD);  
-      }
+        const midBC = GeometricOperations.midVector(B, C);
+        const vecBC = GeometricOperations.makeLeftTurnedVectorFrom(B, C);
+        const line2 = GeometricOperations.makeLineCoordinatesFrom(midBC, vecBC);
 
-      private static leftTurn(v: P5.Vector): void {
+        return GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);  
+    }
+
+    public static leftTurn(v: P5.Vector): void {
         const tmp = v.x;
         v.x = -v.y;
         v.y = tmp;
-      }
+    }
+
+    // Returns a pair of coordinates (start and end) of an elongated line constructed from the point and vector
+    // that vector passes through the point
+    public static makeLineCoordinatesFrom(point: P5.Vector, vector: P5.Vector, howLong: number = 100): Line {
+        const xFactor: number = vector.x*howLong;
+        const yFactor: number = vector.y*howLong;
+
+        return new Line(
+            new P5.Vector(point.x+xFactor, point.y+yFactor),
+            new P5.Vector(point.x-xFactor, point.y-yFactor)
+        )
+    }
+
+    public static makePerpendicularLineFrom(pointA: P5.Vector, pointB: P5.Vector): Line {
+        const ptMidAB: P5.Vector = GeometricOperations.midVector(pointA, pointB);
+        const vecAB = new P5.Vector(pointB.x - pointA.x, pointB.y - pointA.y);
+        GeometricOperations.leftTurn(vecAB);
+        
+        return GeometricOperations.makeLineCoordinatesFrom(ptMidAB, vecAB, 1024);
+    }
+
+    private static makeLeftTurnedVectorFrom(pointA: P5.Vector, pointB: P5.Vector): P5.Vector {
+        const vec = new P5.Vector(pointB.x-pointA.x, pointB.y-pointA.y);
+        GeometricOperations.leftTurn(vec);
+        vec.normalize();
+        vec.mult(-1);
+
+        return vec;
+    }
 }

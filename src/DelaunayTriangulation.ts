@@ -1,6 +1,8 @@
 import P5 from "p5";
 import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
+import Voronoi from "./Voronoi";
+import Line from "./Line";
 
 interface Triangle {
 	a: P5.Vector;
@@ -10,9 +12,11 @@ interface Triangle {
 
 export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcenters: P5.Vector[] = [];
+    private __voronoi: Array<Voronoi> = new Array<Voronoi>();
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
+    public hasVoronoi: boolean = false;
     public static TOLERANCE: number = 1;
 
     constructor(screenSize: number, p5Instance?: P5) {
@@ -53,6 +57,48 @@ export default class DelaunayTriangulation extends Mesh2D {
         }
     
         this.hasCircumcircles = true;
+    }
+
+    public computeVoronoi(): void {
+        this.hasVoronoi = false;
+    
+        this.__voronoi = [];
+        
+        // traverse, circle around each corner
+        for (let i = 0; i < this.numberOfCorners; ++i) {
+            const voronoi = new Voronoi();
+            let current = i;
+
+            while (1) {
+                const ptCurrent: P5.Vector = this.getGeometry(current);
+                const ptPrevious: P5.Vector = this.getGeometry(this.getPreviousCornerId(current));
+                const ptNext: P5.Vector = this.getGeometry(this.getNextCornerId(current));
+
+                const line1: Line = GeometricOperations.makePerpendicularLineFrom(ptCurrent, ptPrevious);
+                const line2: Line = GeometricOperations.makePerpendicularLineFrom(ptCurrent, ptNext);
+
+                const voronoiPoint: P5.Vector = GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);
+                
+                voronoi.voronoi.push(voronoiPoint);
+                
+                current = this.getOppositeCornerId(this.getPreviousCornerId(current));
+
+                if (current == BOUNDARY || this.getOppositeCornerId(current) == BOUNDARY) {
+                    // We won't process anything to do with boundary
+                    voronoi.voronoi = [];
+                    break;
+                }
+    
+                if (current == i) {
+                    if (voronoi.voronoi.length > 0) {
+                        this.__voronoi.push(voronoi);
+                    }
+                    break;
+                }
+            }
+        }
+
+        this.hasVoronoi = true;
     }
 
     public isDuplicated(newPoint: P5.Vector): boolean {
@@ -98,6 +144,7 @@ export default class DelaunayTriangulation extends Mesh2D {
             break;
           }
         }
+        this.computeVoronoi();
     }
 
     public isInTriangle(triangleId: number, point: P5.Vector): boolean {
@@ -179,10 +226,29 @@ export default class DelaunayTriangulation extends Mesh2D {
           const p = this.vertices[i];
           this.__P5Instance.point(p.x, p.y);
         }
-      }
-      
-      /* istanbul ignore next */ 
-      public drawCircumcircles(): void {
+    }
+
+    /* istanbul ignore next */ 
+    public drawVoronoi(): void {
+        if (!this.__P5Instance)
+            return;
+
+        this.__P5Instance.noFill();
+        this.__P5Instance.strokeWeight(1.0);
+        this.__P5Instance.stroke(255,255,255);
+
+        this.__voronoi.forEach((voronoi: Voronoi) => {
+            this.__P5Instance?.beginShape();
+                this.__P5Instance?.colorMode(this.__P5Instance?.RGB, 255);
+                this.__P5Instance?.stroke(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
+                this.__P5Instance?.fill(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
+                voronoi.voronoi.forEach((pt: P5.Vector) => this.__P5Instance?.vertex(pt.x, pt.y));
+            this.__P5Instance?.endShape(this.__P5Instance?.CLOSE);
+        });
+    }
+
+    /* istanbul ignore next */ 
+    public drawCircumcircles(): void {
         if (!this.__P5Instance)
             return;
 
@@ -198,7 +264,7 @@ export default class DelaunayTriangulation extends Mesh2D {
                 const circumcenter = this.__circumcenters[i];
                 const radius = this.__circumcircleRadius[i]*2;
 
-                this.__P5Instance.ellipse(circumcenter.x, circumcenter.y, 5,5);
+                this.__P5Instance.ellipse(circumcenter.x, circumcenter.y, 5, 5);
                 this.__P5Instance.stroke(255,0,0);
                 this.__P5Instance.noFill();
                 this.__P5Instance.ellipse(circumcenter.x, circumcenter.y, radius, radius);
