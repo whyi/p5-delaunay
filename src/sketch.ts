@@ -29,11 +29,11 @@ const sketch = (p5: P5) => {
 		delaunayTriangulation = new DelaunayTriangulation(mySize, p5);
 
 		const btnToggleCircumCircles = p5.createButton('Click to toggle Circumcircles');
-		btnToggleCircumCircles.position(p5.windowWidth/2-120, 60);
+		btnToggleCircumCircles.position(p5.windowWidth/2-200, 60);
 		btnToggleCircumCircles.mousePressed(toggleCircumcircles);
 
 		const btnToggleVoronoiRegions = p5.createButton('Click to toggle Voronoi regions');
-		btnToggleVoronoiRegions.position(p5.windowWidth/2-120, 60);
+		btnToggleVoronoiRegions.position(p5.windowWidth/2, 60);
 		btnToggleVoronoiRegions.mousePressed(toggleVoronoi);
 	};
 
