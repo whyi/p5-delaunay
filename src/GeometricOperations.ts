@@ -60,7 +60,7 @@ export default abstract class GeometricOperations {
 
     // Returns a pair of coordinates (start and end) of an elongated line constructed from the point and vector
     // that vector passes through the point
-    public static makeLineCoordinatesFrom(point: P5.Vector, vector: P5.Vector, howLong: number = 100) {
+    public static makeLineCoordinatesFrom(point: P5.Vector, vector: P5.Vector, howLong: number = 100): Line {
         const xFactor: number = vector.x*howLong;
         const yFactor: number = vector.y*howLong;
 
@@ -68,6 +68,14 @@ export default abstract class GeometricOperations {
             new P5.Vector(point.x+xFactor, point.y+yFactor),
             new P5.Vector(point.x-xFactor, point.y-yFactor)
         )
+    }
+
+    public static makePerpendicularLineFrom(pointA: P5.Vector, pointB: P5.Vector): Line {
+        const ptMidAB: P5.Vector = GeometricOperations.midVector(pointA, pointB);
+        const vecAB = new P5.Vector(pointB.x - pointA.x, pointB.y - pointA.y);
+        GeometricOperations.leftTurn(vecAB);
+        
+        return GeometricOperations.makeLineCoordinatesFrom(ptMidAB, vecAB, 1024);
     }
 
     private static makeLeftTurnedVectorFrom(pointA: P5.Vector, pointB: P5.Vector): P5.Vector {
