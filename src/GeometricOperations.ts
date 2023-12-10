@@ -40,18 +40,12 @@ export default abstract class GeometricOperations {
     }
 
     public static circumcenter(A: P5.Vector, B: P5.Vector, C: P5.Vector): P5.Vector {
-        const midAB = GeometricOperations.midVector(A,B);
-        const AB = new P5.Vector(B.x-A.x, B.y-A.y);
-        this.leftTurn(AB);
-        AB.normalize();
-        AB.mult(-1);
+        const midAB = GeometricOperations.midVector(A, B);
+        const AB = GeometricOperations.makeLeftTurnedVectorFrom(A, B);
       
-        const midBC = GeometricOperations.midVector(B,C);
-        const BC = new P5.Vector(C.x-B.x, C.y-B.y);
-        this.leftTurn(BC);
-        BC.normalize();
-        BC.mult(-1);
-      
+        const midBC = GeometricOperations.midVector(B, C);
+        const BC = GeometricOperations.makeLeftTurnedVectorFrom(B, C);
+
         const fact = 100;
       
         const AA = new P5.Vector(midAB.x+AB.x*fact, midAB.y+AB.y*fact);
@@ -66,5 +60,14 @@ export default abstract class GeometricOperations {
         const tmp = v.x;
         v.x = -v.y;
         v.y = tmp;
+    }
+
+    private static makeLeftTurnedVectorFrom(pointA: P5.Vector, pointB: P5.Vector): P5.Vector {
+        const vec = new P5.Vector(pointB.x-pointA.x, pointB.y-pointA.y);
+        GeometricOperations.leftTurn(vec);
+        vec.normalize();
+        vec.mult(-1);
+
+        return vec;
     }
 }
