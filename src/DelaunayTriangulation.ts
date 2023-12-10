@@ -3,28 +3,30 @@ import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
 import Voronoi from "./Voronoi";
 import Line from "./Line";
-
-interface Triangle {
-	a: P5.Vector;
-	b: P5.Vector;
-	c: P5.Vector;
-};
+import Triangle from "./Triangle";
+import Circle from "./Circle";
+import IRenderer from "./IRenderer";
 
 export default class DelaunayTriangulation extends Mesh2D {
-	private __circumcenters: P5.Vector[] = new Array<P5.Vector>();
+	private __circumcenters: Array<P5.Vector> = new Array<P5.Vector>();
     private __voronoi: Array<Voronoi> = new Array<Voronoi>();
 	private __circumcircleRadius: number[] = [];
-    private __P5Instance: P5 | undefined;
+
+    // containers to support rendering
+    private __trianglesForRenderer: Array<Triangle> = new Array<Triangle>();
+    private __verticesForRenderer: Array<P5.Vector> = new Array<P5.Vector>();
+    private __circumcirclesForRenderer: Array<Circle> = new Array<Circle>();
+
+    // renderer
+    private __renderer!: IRenderer;
+
     public hasCircumcircles: boolean = false;
     public hasVoronoi: boolean = false;
     public static TOLERANCE: number = 1;
 
-    constructor(screenSize: number, p5Instance?: P5) {
+    constructor(screenSize: number, renderer: IRenderer) {
         super();
-
-        if (p5Instance) {
-            this.__P5Instance = p5Instance;
-        }
+        this.__renderer = renderer;
         DelaunayTriangulation.TOLERANCE = Number.EPSILON * screenSize;
         this.initTriangles(screenSize);
     }
@@ -43,17 +45,31 @@ export default class DelaunayTriangulation extends Mesh2D {
         this.buildOTable();
     }
 
-    public computeCircumcenters(): void {
+    public render(shouldDrawCircumcircles: boolean, shouldDrawVoronoi: boolean): void {
+        this.__renderer.drawTriangles(this.__trianglesForRenderer);
+        this.__renderer.drawVertices(this.__verticesForRenderer);
+
+        if (shouldDrawCircumcircles && this.hasCircumcircles) {
+            this.__renderer.drawCircumcircles(this.__circumcirclesForRenderer);
+        }
+        
+        if (shouldDrawVoronoi && this.hasVoronoi) {
+            this.__renderer.drawVoronoi(this.__voronoi);
+        }
+    }
+
+    public computeCircumcircles(): void {
         this.hasCircumcircles = false;
     
         this.__circumcenters = [];
         this.__circumcircleRadius = [];
         for (let i = 0; i < this.numberOfTriangles; ++i) {
             const cornerId = i*3;
-            const triangle = this.getTriangleVerticesFromCornerId(cornerId);
-            const circumcenter = GeometricOperations.circumcenter(triangle.a, triangle.b, triangle.c);
+            const triangle = this.getTriangleFromCornerId(cornerId);
+            const circumcenter = GeometricOperations.circumcenter(triangle);
+
             this.__circumcenters.push(circumcenter);
-            this.__circumcircleRadius.push(triangle.a.dist(circumcenter));
+            this.__circumcircleRadius.push(triangle.ptA.dist(circumcenter));
         }
     
         this.hasCircumcircles = true;
@@ -79,18 +95,18 @@ export default class DelaunayTriangulation extends Mesh2D {
 
                 const voronoiPoint: P5.Vector = GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);
                 
-                voronoi.voronoi.push(voronoiPoint);
+                voronoi.vertices.push(voronoiPoint);
                 
                 current = this.getOppositeCornerId(this.getPreviousCornerId(current));
 
                 if (current == BOUNDARY || this.getOppositeCornerId(current) == BOUNDARY) {
                     // We won't process anything to do with boundary
-                    voronoi.voronoi = [];
+                    voronoi.vertices = [];
                     break;
                 }
     
                 if (current == i) {
-                    if (voronoi.voronoi.length > 0) {
+                    if (voronoi.vertices.length > 0) {
                         this.__voronoi.push(voronoi);
                     }
                     break;
@@ -145,18 +161,35 @@ export default class DelaunayTriangulation extends Mesh2D {
             }
         }
         this.computeVoronoi();
+        this.computeCircumcircles();
+        this.updateRendererData();
+    }
+
+    private updateRendererData(): void {
+        this.__trianglesForRenderer = [];
+
+        for (let i = 0; i < this.numberOfTriangles; ++i) {
+            const cornerId = i*3;
+            const triangle = this.getTriangleFromCornerId(cornerId);
+            this.__trianglesForRenderer.push(triangle)
+        }
+
+        // make a deep copy
+        this.__verticesForRenderer = [...this.vertices];
+        this.__circumcirclesForRenderer = this.__circumcenters.map(
+            (center:P5.Vector, idx:number) => new Circle(center, this.__circumcircleRadius[idx]*2) );
     }
 
     public isInTriangle(triangleId: number, point: P5.Vector): boolean {
         const cornerId = triangleId*3;
-        const triangle = this.getTriangleVerticesFromCornerId(cornerId);
+        const triangle = this.getTriangleFromCornerId(cornerId);
 
-        const temp = triangle.b;
-        triangle.b = triangle.c;
-        triangle.c = temp;
+        const temp = triangle.ptB;
+        triangle.ptB = triangle.ptC;
+        triangle.ptC = temp;
 
-        if (GeometricOperations.isLeftTurn(triangle.a,triangle.b,point) == GeometricOperations.isLeftTurn(triangle.b,triangle.c,point) &&
-            GeometricOperations.isLeftTurn(triangle.a,triangle.b,point) == GeometricOperations.isLeftTurn(triangle.c,triangle.a,point)) {
+        if (GeometricOperations.isLeftTurn(triangle.ptA,triangle.ptB,point) == GeometricOperations.isLeftTurn(triangle.ptB,triangle.ptC,point) &&
+            GeometricOperations.isLeftTurn(triangle.ptA,triangle.ptB,point) == GeometricOperations.isLeftTurn(triangle.ptC,triangle.ptA,point)) {
             return true;
         }
       
@@ -198,88 +231,19 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
 
     public isDelaunay(cornerId: number): boolean {
-        const triangle = this.getTriangleVerticesFromCornerId(cornerId);
-        const circumcenter = GeometricOperations.circumcenter(triangle.a, triangle.b, triangle.c);
-        const radius = triangle.a.dist(circumcenter);
+        const triangle = this.getTriangleFromCornerId(cornerId);
+        const circumcenter = GeometricOperations.circumcenter(triangle);
+        const radius = triangle.ptA.dist(circumcenter);
         const oppositePoint = this.getGeometry(this.getOppositeCornerId(cornerId));
 
         return oppositePoint.dist(circumcenter) > radius;
     }
 
-    /* istanbul ignore next */ 
-    public drawTriangles(): void {
-        if (!this.__P5Instance)
-            return;
-
-        this.__P5Instance.noFill();
-        this.__P5Instance.strokeWeight(1.0);
-        this.__P5Instance.stroke(0,255,0);
-      
-        for (let i = 0; i < this.numberOfTriangles; ++i) {
-          const cornerId = i*3;
-          const triangle = this.getTriangleVerticesFromCornerId(cornerId);
-          this.__P5Instance.triangle(triangle.a.x, triangle.a.y, triangle.b.x, triangle.b.y, triangle.c.x, triangle.c.y);
-        }
-      
-        this.__P5Instance.strokeWeight(5.0);
-        for (let i = 0; i < this.numberOfVertices; ++i) {
-          const p = this.vertices[i];
-          this.__P5Instance.point(p.x, p.y);
-        }
-    }
-
-    /* istanbul ignore next */ 
-    public drawVoronoi(): void {
-        if (!this.__P5Instance)
-            return;
-
-        this.__P5Instance.noFill();
-        this.__P5Instance.strokeWeight(1.0);
-        this.__P5Instance.stroke(255,255,255);
-
-        this.__voronoi.forEach((voronoi: Voronoi) => {
-            this.__P5Instance?.beginShape();
-                this.__P5Instance?.colorMode(this.__P5Instance?.RGB, 255);
-                this.__P5Instance?.stroke(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
-                this.__P5Instance?.fill(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
-                voronoi.voronoi.forEach((pt: P5.Vector) => this.__P5Instance?.vertex(pt.x, pt.y));
-            this.__P5Instance?.endShape(this.__P5Instance?.CLOSE);
-        });
-    }
-
-    /* istanbul ignore next */ 
-    public drawCircumcircles(): void {
-        if (!this.__P5Instance)
-            return;
-
-        if (this.hasCircumcircles) {
-            this.__P5Instance.stroke(255,0,0);
-            this.__P5Instance.noFill();
-            this.__P5Instance.strokeWeight(1.0);
-        
-            for (let i = 3; i < this.numberOfTriangles; ++i) {
-                this.__P5Instance.stroke(0,0,255);
-                this.__P5Instance.fill(0,0,255);
-
-                const circumcenter = this.__circumcenters[i];
-                const radius = this.__circumcircleRadius[i]*2;
-
-                this.__P5Instance.ellipse(circumcenter.x, circumcenter.y, 5, 5);
-                this.__P5Instance.stroke(255,0,0);
-                this.__P5Instance.noFill();
-                this.__P5Instance.ellipse(circumcenter.x, circumcenter.y, radius, radius);
-            }
- 
-            this.__P5Instance.stroke(0,0,0);
-            this.__P5Instance.noFill();
-        }
-    }
-
-    private getTriangleVerticesFromCornerId(cornerId: number): Triangle {
+    private getTriangleFromCornerId(cornerId: number): Triangle {
         const pointA = this.getGeometry(cornerId);
         const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
         const pointC = this.getGeometry(this.getNextCornerId(cornerId));
 
-        return {a: pointA, b: pointB, c: pointC};
+        return new Triangle(pointA, pointB, pointC);
     }
 }

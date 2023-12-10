@@ -1,5 +1,6 @@
 import P5 from "p5";
 import "./styles.scss";
+import Renderer from "./Renderer"
 import DelaunayTriangulation from "./DelaunayTriangulation";
 
 const sketch = (p5: P5) => {
@@ -10,7 +11,7 @@ const sketch = (p5: P5) => {
 	function toggleCircumcircles(): void {
 		shouldDrawCircumcircles = !shouldDrawCircumcircles;
 		if (shouldDrawCircumcircles) {
-			delaunayTriangulation.computeCircumcenters();
+			delaunayTriangulation.computeCircumcircles();
 		}
 	}
 
@@ -26,7 +27,7 @@ const sketch = (p5: P5) => {
 		const canvas = p5.createCanvas(mySize, mySize);
 		canvas.parent("sketch");
 
-		delaunayTriangulation = new DelaunayTriangulation(mySize, p5);
+		delaunayTriangulation = new DelaunayTriangulation(mySize, new Renderer(p5));
 
 		const btnToggleCircumCircles = p5.createButton('Click to toggle Circumcircles');
 		btnToggleCircumCircles.position(p5.windowWidth/2-200, 60);
@@ -39,14 +40,7 @@ const sketch = (p5: P5) => {
 
 	p5.draw = () => {
 		p5.background(0);
-		delaunayTriangulation.drawTriangles();
-		if (shouldDrawCircumcircles) {
-			delaunayTriangulation.drawCircumcircles();
-		}
-
-		if (shouldDrawVoronoi) {
-			delaunayTriangulation.drawVoronoi();
-		}
+		delaunayTriangulation.render(shouldDrawCircumcircles, shouldDrawVoronoi);
 	};
 
 	p5.mouseClicked = () => {

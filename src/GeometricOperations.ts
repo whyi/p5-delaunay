@@ -1,5 +1,6 @@
 import P5 from "p5";
 import Line from "./Line";
+import Triangle from "./Triangle";
 
 export default abstract class GeometricOperations {
     public static cross2D(U: P5.Vector, V: P5.Vector): number {
@@ -40,13 +41,13 @@ export default abstract class GeometricOperations {
         return new P5.Vector((A.x + B.x)/2, (A.y + B.y)/2);
     }
 
-    public static circumcenter(A: P5.Vector, B: P5.Vector, C: P5.Vector): P5.Vector {
-        const midAB = GeometricOperations.midVector(A, B);
-        const vecAB = GeometricOperations.makeLeftTurnedVectorFrom(A, B);
+    public static circumcenter(triangle: Triangle): P5.Vector {
+        const midAB = GeometricOperations.midVector(triangle.ptA, triangle.ptB);
+        const vecAB = GeometricOperations.makeLeftTurnedVectorFrom(triangle.ptA, triangle.ptB);
         const line1 = GeometricOperations.makeLineCoordinatesFrom(midAB, vecAB);
 
-        const midBC = GeometricOperations.midVector(B, C);
-        const vecBC = GeometricOperations.makeLeftTurnedVectorFrom(B, C);
+        const midBC = GeometricOperations.midVector(triangle.ptB, triangle.ptC);
+        const vecBC = GeometricOperations.makeLeftTurnedVectorFrom(triangle.ptB, triangle.ptC);
         const line2 = GeometricOperations.makeLineCoordinatesFrom(midBC, vecBC);
 
         return GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);  
