@@ -58,18 +58,9 @@ export default abstract class GeometricOperations {
         v.y = tmp;
     }
 
-    private static makeLeftTurnedVectorFrom(pointA: P5.Vector, pointB: P5.Vector): P5.Vector {
-        const vec = new P5.Vector(pointB.x-pointA.x, pointB.y-pointA.y);
-        GeometricOperations.leftTurn(vec);
-        vec.normalize();
-        vec.mult(-1);
-
-        return vec;
-    }
-
     // Returns a pair of coordinates (start and end) of an elongated line constructed from the point and vector
     // that vector passes through the point
-    private static makeLineCoordinatesFrom(point: P5.Vector, vector: P5.Vector, howLong: number = 100) {
+    public static makeLineCoordinatesFrom(point: P5.Vector, vector: P5.Vector, howLong: number = 100) {
         const xFactor: number = vector.x*howLong;
         const yFactor: number = vector.y*howLong;
 
@@ -77,5 +68,14 @@ export default abstract class GeometricOperations {
             new P5.Vector(point.x+xFactor, point.y+yFactor),
             new P5.Vector(point.x-xFactor, point.y-yFactor)
         )
+    }
+
+    private static makeLeftTurnedVectorFrom(pointA: P5.Vector, pointB: P5.Vector): P5.Vector {
+        const vec = new P5.Vector(pointB.x-pointA.x, pointB.y-pointA.y);
+        GeometricOperations.leftTurn(vec);
+        vec.normalize();
+        vec.mult(-1);
+
+        return vec;
     }
 }
