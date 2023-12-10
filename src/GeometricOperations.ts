@@ -60,11 +60,11 @@ export default abstract class GeometricOperations {
         const DD = new P5.Vector(midBC.x-BC.x*fact, midBC.y-BC.y*fact);
 
         return GeometricOperations.intersection(AA, BB, CC, DD);  
-      }
+    }
 
-      private static leftTurn(v: P5.Vector): void {
+    public static leftTurn(v: P5.Vector): void {
         const tmp = v.x;
         v.x = -v.y;
         v.y = tmp;
-      }
+    }
 }

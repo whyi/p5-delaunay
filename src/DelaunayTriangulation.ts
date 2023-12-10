@@ -1,6 +1,7 @@
 import P5 from "p5";
 import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
+import Voronoi from "./Voronoi";
 
 interface Triangle {
 	a: P5.Vector;
@@ -10,12 +11,13 @@ interface Triangle {
 
 export default class DelaunayTriangulation extends Mesh2D {
 	private __circumcenters: P5.Vector[] = [];
-    private __voronoi: P5.Vector[] = [];
+    private __voronoi: Array<Voronoi> = new Array<Voronoi>();
 	private __circumcircleRadius: number[] = [];
     private __P5Instance: P5 | undefined;
     public hasCircumcircles: boolean = false;
     public hasVoronoi: boolean = false;
     public static TOLERANCE: number = 1;
+    private __currentCorner: number = 0;
 
     constructor(screenSize: number, p5Instance?: P5) {
         super();
@@ -61,7 +63,54 @@ export default class DelaunayTriangulation extends Mesh2D {
         this.hasVoronoi = false;
     
         this.__voronoi = [];
-   
+        
+        // traverse, circle around each corner
+        for (let i = 0; i < this.numberOfCorners; ++i) {
+            const voronoi = new Voronoi();
+            let current = i;
+
+            while (1) {
+                const ptCurrent: P5.Vector = this.getGeometry(current);
+                const ptPrevious: P5.Vector = this.getGeometry(this.getPreviousCornerId(current));
+                const ptNext: P5.Vector = this.getGeometry(this.getNextCornerId(current));
+                
+                const ptMidEdge1: P5.Vector = GeometricOperations.midVector(ptCurrent, ptPrevious);
+                const ptMidEdge2: P5.Vector = GeometricOperations.midVector(ptCurrent, ptNext);
+    
+                const vecMidEdge1 = new P5.Vector(ptPrevious.x - ptCurrent.x, ptPrevious.y - ptCurrent.y);
+                GeometricOperations.leftTurn(vecMidEdge1);
+    
+                const vecMidEdge2 = new P5.Vector(ptNext.x - ptCurrent.x, ptNext.y - ptCurrent.y);
+                GeometricOperations.leftTurn(vecMidEdge2);
+    
+                const fact = 1024;
+                
+                const AA = new P5.Vector(ptMidEdge1.x+vecMidEdge1.x*fact, ptMidEdge1.y+vecMidEdge1.y*fact);
+                const BB = new P5.Vector(ptMidEdge1.x-vecMidEdge1.x*fact, ptMidEdge1.y-vecMidEdge1.y*fact);
+                const CC = new P5.Vector(ptMidEdge2.x+vecMidEdge2.x*fact, ptMidEdge2.y+vecMidEdge2.y*fact);
+                const DD = new P5.Vector(ptMidEdge2.x-vecMidEdge2.x*fact, ptMidEdge2.y-vecMidEdge2.y*fact);
+                
+                const voronoiPoint: P5.Vector = GeometricOperations.intersection(AA, BB, CC, DD);
+                
+                voronoi.voronoi.push(voronoiPoint);
+                current = this.getOppositeCornerId(this.getPreviousCornerId(current));
+                if (current == BOUNDARY || this.getOppositeCornerId(current) == BOUNDARY) {
+                    // We won't process anything to do with boundary
+                    voronoi.voronoi = [];
+                    break;
+                }
+    
+                if (current == i) {
+                    break;
+                }
+            }
+
+            if (voronoi.voronoi.length > 0) {
+                this.__voronoi.push(voronoi);
+            }
+        }
+
+        //console.log(`# of voronoi : ${this.__voronoi.length}`);
         this.hasVoronoi = true;
     }
 
@@ -108,6 +157,7 @@ export default class DelaunayTriangulation extends Mesh2D {
             break;
           }
         }
+        this.computeVoronoi();
     }
 
     public isInTriangle(triangleId: number, point: P5.Vector): boolean {
@@ -189,8 +239,27 @@ export default class DelaunayTriangulation extends Mesh2D {
           const p = this.vertices[i];
           this.__P5Instance.point(p.x, p.y);
         }
-      }
-      
+    }
+
+    /* istanbul ignore next */ 
+    public drawVoronoi(): void {
+        if (!this.__P5Instance)
+            return;
+
+        this.__P5Instance.noFill();
+        this.__P5Instance.strokeWeight(1.0);
+        this.__P5Instance.stroke(255,255,255);
+
+        this.__voronoi.forEach((voronoi: Voronoi) => {
+            this.__P5Instance?.beginShape();
+                this.__P5Instance?.colorMode(this.__P5Instance?.RGB, 255);
+                this.__P5Instance?.stroke(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
+                this.__P5Instance?.fill(this.__P5Instance?.color(voronoi.red, voronoi.green, voronoi.blue, 50));
+                voronoi.voronoi.forEach((pt: P5.Vector) => this.__P5Instance?.vertex(pt.x, pt.y));
+            this.__P5Instance?.endShape(this.__P5Instance?.CLOSE);
+        });
+    }
+
     /* istanbul ignore next */ 
     public drawCircumcircles(): void {
         if (!this.__P5Instance)
