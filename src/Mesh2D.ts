@@ -1,5 +1,5 @@
 import { Vector } from "p5";
-import { IMesh2D } from "./IMesh2D";
+import IMesh2D from "./IMesh2D";
 
 const BOUNDARY=-1
 

@@ -1,6 +1,6 @@
 import { Vector } from "p5";
 
-interface IMesh2D {
+export default interface IMesh2D {
     numberOfVertices: number;
     numberOfTriangles: number;
     numberOfCorners: number;
@@ -14,5 +14,3 @@ interface IMesh2D {
     getNextCornerId:(cornerId: number) => number;
     getPreviousCornerId:(cornerId: number) => number;
 }
-
-export {IMesh2D}
