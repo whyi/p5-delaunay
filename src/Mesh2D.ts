@@ -3,7 +3,7 @@ import IMesh2D from "./IMesh2D";
 
 const BOUNDARY=-1
 
-interface Triplet {
+type Triplet = {
 	a: number;
 	b: number;
 	c: number;
