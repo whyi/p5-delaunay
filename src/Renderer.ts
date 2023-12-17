@@ -1,8 +1,8 @@
 import P5 from "p5";
 import IRenderer from './IRenderer'
-import Triangle from './Triangle'
-import Voronoi from "./Voronoi";
-import Circle from "./Circle";
+import Triangle from './Primitives/Triangle'
+import Voronoi from "./Primitives/Voronoi";
+import Circle from "./Primitives/Circle";
 
 export default class Renderer implements IRenderer {
     private __p5Instance!: P5;

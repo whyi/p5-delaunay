@@ -1,10 +1,10 @@
 import P5 from "p5";
 import Mesh2D, { BOUNDARY } from "./Mesh2D";
 import GeometricOperations from "./GeometricOperations";
-import Voronoi from "./Voronoi";
-import Line from "./Line";
-import Triangle from "./Triangle";
-import Circle from "./Circle";
+import Voronoi from "./Primitives/Voronoi";
+import Line from "./Primitives/Line";
+import Triangle from "./Primitives/Triangle";
+import Circle from "./Primitives/Circle";
 import IRenderer from "./IRenderer";
 
 export default class DelaunayTriangulation extends Mesh2D {
@@ -20,8 +20,10 @@ export default class DelaunayTriangulation extends Mesh2D {
     // renderer
     private __renderer!: IRenderer;
 
-    public hasCircumcircles: boolean = false;
-    public hasVoronoi: boolean = false;
+    // renderer control: check for P5 double buffering to remove later.
+    private __hasCircumcircles: boolean = false;
+    private __hasVoronoi: boolean = false;
+
     public static TOLERANCE: number = 1;
 
     constructor(screenSize: number, renderer: IRenderer) {
@@ -45,21 +47,21 @@ export default class DelaunayTriangulation extends Mesh2D {
         this.buildOTable();
     }
 
-    public render(shouldDrawCircumcircles: boolean, shouldDrawVoronoi: boolean): void {
+    public render(renderingParameter: { shouldDrawCircumcircles: boolean, shouldDrawVoronoi: boolean }): void {
         this.__renderer.drawTriangles(this.__trianglesForRenderer);
         this.__renderer.drawVertices(this.__verticesForRenderer);
 
-        if (shouldDrawCircumcircles && this.hasCircumcircles) {
+        if (renderingParameter.shouldDrawCircumcircles && this.__hasCircumcircles) {
             this.__renderer.drawCircumcircles(this.__circumcirclesForRenderer);
         }
         
-        if (shouldDrawVoronoi && this.hasVoronoi) {
+        if (renderingParameter.shouldDrawVoronoi && this.__hasVoronoi) {
             this.__renderer.drawVoronoi(this.__voronoi);
         }
     }
 
     public computeCircumcircles(): void {
-        this.hasCircumcircles = false;
+        this.__hasCircumcircles = false;
     
         this.__circumcenters = [];
         this.__circumcircleRadius = [];
@@ -72,11 +74,11 @@ export default class DelaunayTriangulation extends Mesh2D {
             this.__circumcircleRadius.push(triangle.ptA.dist(circumcenter));
         }
     
-        this.hasCircumcircles = true;
+        this.__hasCircumcircles = true;
     }
 
     public computeVoronoi(): void {
-        this.hasVoronoi = false;
+        this.__hasVoronoi = false;
     
         this.__voronoi = [];
         
@@ -114,7 +116,7 @@ export default class DelaunayTriangulation extends Mesh2D {
             }
         }
 
-        this.hasVoronoi = true;
+        this.__hasVoronoi = true;
     }
 
     public isDuplicated(newPoint: P5.Vector): boolean {

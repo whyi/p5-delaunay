@@ -190,24 +190,4 @@ describe('DelaunayTriangulation', () => {
       expect(twoTriangles.isDelaunay(4)).toBe(false);
     })
   })
-
-  describe("computeCircumcircles", () => {
-    it ("calculates circumcenters and radius", () => {
-      twoTriangles = new DelaunayTriangulation(1, RenderMock)
-
-      expect(twoTriangles.hasCircumcircles).toBe(false);
-      twoTriangles.computeCircumcircles();
-      expect(twoTriangles.hasCircumcircles).toBe(true);
-    })
-  })
-
-  describe("computeVoronoi", () => {
-    it ("calculates Voronoi regions", () => {
-      twoTriangles = new DelaunayTriangulation(1, RenderMock)
-
-      expect(twoTriangles.hasVoronoi).toBe(false);
-      twoTriangles.computeVoronoi();
-      expect(twoTriangles.hasVoronoi).toBe(true);
-    })
-  })
 });

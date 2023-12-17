@@ -40,7 +40,7 @@ const sketch = (p5: P5) => {
 
 	p5.draw = () => {
 		p5.background(0);
-		delaunayTriangulation.render(shouldDrawCircumcircles, shouldDrawVoronoi);
+		delaunayTriangulation.render({shouldDrawCircumcircles, shouldDrawVoronoi});
 	};
 
 	p5.mouseClicked = () => {

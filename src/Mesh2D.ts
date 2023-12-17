@@ -30,10 +30,7 @@ export default class Mesh2D implements IMesh2D {
 	corners: number[] = [];
 	opposites: number[] = [];
 
-	constructor() {
-	}
-
-	buildOTable(): void {
+	public buildOTable(): void {
 		this.opposites = Array(this.numberOfCorners).fill(BOUNDARY);
 
 		const triples: Triplet[] = [];
@@ -63,23 +60,23 @@ export default class Mesh2D implements IMesh2D {
 		}
 	}
 
-	getGeometry(cornerId: number): Vector {
+	public getGeometry(cornerId: number): Vector {
 		return this.vertices[this.getVertexId(cornerId)];
 	}
 
-	getVertexId(cornerId: number): number {
+	public getVertexId(cornerId: number): number {
 		return this.corners[cornerId];
 	}
 
-	getOppositeCornerId(cornerId: number): number {
+	public getOppositeCornerId(cornerId: number): number {
 		return this.opposites[cornerId];
 	}
 
-	getNextCornerId(cornerId: number): number {
+	public getNextCornerId(cornerId: number): number {
 		return cornerId%3 == 2? cornerId-2 : cornerId+1;
 	}
 
-	getPreviousCornerId(cornerId: number): number {
+	public getPreviousCornerId(cornerId: number): number {
 		return cornerId%3 == 0? cornerId+2 : cornerId-1;
 	}
 }

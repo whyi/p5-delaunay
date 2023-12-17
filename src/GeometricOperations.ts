@@ -1,6 +1,6 @@
 import P5 from "p5";
-import Line from "./Line";
-import Triangle from "./Triangle";
+import Line from "./Primitives/Line";
+import Triangle from "./Primitives/Triangle";
 
 export default abstract class GeometricOperations {
     public static cross2D(U: P5.Vector, V: P5.Vector): number {
