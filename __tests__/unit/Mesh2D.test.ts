@@ -5,8 +5,9 @@
 import {expect} from '@jest/globals';
 import p5 from "p5";
 import Mesh2D, { BOUNDARY } from '../../src/Mesh2D';
+import IMesh2D from '../../src/IMesh2D';
 
-let twoTriangles: Mesh2D;
+let twoTriangles: IMesh2D;
 function InitTwoTriangles()
 {
     /*
@@ -15,18 +16,20 @@ function InitTwoTriangles()
     | \|
     3--2
     */
-    twoTriangles = new Mesh2D()
-    twoTriangles.vertices = [
+    const vertices: Array<p5.Vector> = [
         new p5.Vector(0,0),
         new p5.Vector(0,1),
         new p5.Vector(1,1),
         new p5.Vector(1,0)
     ];
-    twoTriangles.numberOfVertices = 4;
-    twoTriangles.corners = [0,1,2,2,3,0];
-    twoTriangles.numberOfTriangles = 2;
-    twoTriangles.numberOfCorners = 6;
+
+    jest.spyOn(Mesh2D.prototype, 'vertices', 'get').mockImplementation(() => vertices);
+    jest.spyOn(Mesh2D.prototype, 'corners', 'get').mockImplementation(() => [0,1,2,2,3,0]);
+    jest.spyOn(Mesh2D.prototype, 'numberOfCorners', 'get').mockImplementation(() => 6);
+
+    twoTriangles = new Mesh2D();
 }
+
 beforeEach(() => {
     InitTwoTriangles();
 });
