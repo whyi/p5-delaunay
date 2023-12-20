@@ -24,6 +24,10 @@ function clearMocks() {
   isDuplicated.mockClear();
 }
 
+function setTwoTrianglesVertices(vertices: Array<Vector>) {
+  jest.spyOn(DelaunayTriangulation.prototype, 'vertices', 'get').mockImplementation(() => vertices);
+}
+
 describe('DelaunayTriangulation', () => {
   describe("addPoint", () => {
     beforeEach(() => clearMocks());
@@ -131,12 +135,12 @@ describe('DelaunayTriangulation', () => {
     it ("does not process if given corner already satisfy Delaunay property", () => {
       // https://tasks.illustrativemathematics.org/content-standards/tasks/1687
       twoTriangles = new DelaunayTriangulation(4, RenderMock)
-      twoTriangles.vertices = [
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(3,1),
         new P5.Vector(1,3),
         new P5.Vector(-2,2)
-      ];
+      ]);
 
       twoTriangles.flipCorner(4);
       
@@ -147,12 +151,12 @@ describe('DelaunayTriangulation', () => {
 
     it ("recursively flip corners if given corner doesn't satisfy Delaunay property", () => {
       twoTriangles = new DelaunayTriangulation(4, RenderMock)
-      twoTriangles.vertices = [
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(0.5,0.5),
         new P5.Vector(1,0.5),
         new P5.Vector(0.5,0)
-      ];
+      ]);
 
       twoTriangles.flipCorner(4);
 
@@ -166,12 +170,12 @@ describe('DelaunayTriangulation', () => {
     it ("returns true if opposite corner is outside of circumcircle's radius", () => {    
       // https://tasks.illustrativemathematics.org/content-standards/tasks/1687
       twoTriangles = new DelaunayTriangulation(4, RenderMock)
-      twoTriangles.vertices = [
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(3,1),
         new P5.Vector(1,3),
         new P5.Vector(-2,2)
-      ];
+      ]);
       twoTriangles.buildOTable();
       expect(twoTriangles.isDelaunay(4)).toBe(true);
     })
@@ -180,13 +184,12 @@ describe('DelaunayTriangulation', () => {
       twoTriangles = new DelaunayTriangulation(1, RenderMock)
 
       // Modify initial mock to make a very skewed triangles
-      twoTriangles.vertices = [
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(0.5,0.5),
         new P5.Vector(1,0.5),
         new P5.Vector(0.5,0)
-      ];
-      twoTriangles.buildOTable();
+      ]);
       expect(twoTriangles.isDelaunay(4)).toBe(false);
     })
   })

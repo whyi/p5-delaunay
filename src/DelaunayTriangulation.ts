@@ -8,11 +8,16 @@ import Circle from "./Primitives/Circle";
 import IRenderer from "./IRenderer";
 
 export default class DelaunayTriangulation extends Mesh2D {
+    // container to hold coordinates of circumcenters
 	private __circumcenters: Array<P5.Vector> = new Array<P5.Vector>();
-    private __voronoi: Array<Voronoi> = new Array<Voronoi>();
-	private __circumcircleRadius: number[] = [];
 
-    // containers to support rendering
+    // container to hold radius of circumcenters
+    private __circumcircleRadius: Array<number> = new Array<number>();
+
+    // container to hold Voronoi regions
+    private __voronoi: Array<Voronoi> = new Array<Voronoi>();
+
+    // containers to support rendering, see also updateRendererData()
     private __trianglesForRenderer: Array<Triangle> = new Array<Triangle>();
     private __verticesForRenderer: Array<P5.Vector> = new Array<P5.Vector>();
     private __circumcirclesForRenderer: Array<Circle> = new Array<Circle>();
@@ -34,16 +39,16 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
       
     private initTriangles(screenSize: number): void {
-        this.vertices = [
+        this._vertices = [
             new P5.Vector(0,0),
             new P5.Vector(0,screenSize),
             new P5.Vector(screenSize,screenSize),
             new P5.Vector(screenSize,0)
         ];
-        this.numberOfVertices = 4;
-        this.corners = [0,1,2,2,3,0];
-        this.numberOfTriangles = 2;
-        this.numberOfCorners = 6;
+        this._numberOfVertices = 4;
+        this._corners = [0,1,2,2,3,0];
+        this._numberOfTriangles = 2;
+        this._numberOfCorners = 6;
         this.buildOTable();
     }
 
@@ -65,7 +70,7 @@ export default class DelaunayTriangulation extends Mesh2D {
     
         this.__circumcenters = [];
         this.__circumcircleRadius = [];
-        for (let i = 0; i < this.numberOfTriangles; ++i) {
+        for (let i = 0; i < this._numberOfTriangles; ++i) {
             const cornerId = i*3;
             const triangle = this.getTriangleFromCornerId(cornerId);
             const circumcenter = GeometricOperations.circumcenter(triangle);
@@ -80,14 +85,14 @@ export default class DelaunayTriangulation extends Mesh2D {
     public computeVoronoi(): void {
         this.__hasVoronoi = false;
     
-        this.__voronoi = [];
+        this.__voronoi = new Array<Voronoi>();
         
         // traverse, circle around each corner
-        for (let i = 0; i < this.numberOfCorners; ++i) {
+        for (let i = 0; i < this._numberOfCorners; ++i) {
             const voronoi = new Voronoi();
             let current = i;
 
-            while (1) {
+            while (true) {
                 const ptCurrent: P5.Vector = this.getGeometry(current);
                 const ptPrevious: P5.Vector = this.getGeometry(this.getPreviousCornerId(current));
                 const ptNext: P5.Vector = this.getGeometry(this.getNextCornerId(current));
@@ -95,7 +100,7 @@ export default class DelaunayTriangulation extends Mesh2D {
                 const line1: Line = GeometricOperations.makePerpendicularLineFrom(ptCurrent, ptPrevious);
                 const line2: Line = GeometricOperations.makePerpendicularLineFrom(ptCurrent, ptNext);
 
-                const voronoiPoint: P5.Vector = GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);
+                const voronoiPoint: P5.Vector = GeometricOperations.intersection(line1, line2);
                 
                 voronoi.vertices.push(voronoiPoint);
                 
@@ -121,7 +126,7 @@ export default class DelaunayTriangulation extends Mesh2D {
 
     public isDuplicated(newPoint: P5.Vector): boolean {
         // refactor to use quadtree later on.
-        return this.vertices.some((p) => p.dist(newPoint) <= DelaunayTriangulation.TOLERANCE);
+        return this._vertices.some((p) => p.dist(newPoint) <= DelaunayTriangulation.TOLERANCE);
     }
 
     public addPoint(x: number, y: number): void {
@@ -131,33 +136,29 @@ export default class DelaunayTriangulation extends Mesh2D {
             return;
         }
 
-        this.vertices.push(newPoint);
-        ++this.numberOfVertices;
+        this._vertices.push(newPoint);
+        ++this._numberOfVertices;
 
-        const currentNumberOfTriangles: number = this.numberOfTriangles;
+        const currentNumberOfTriangles: number = this._numberOfTriangles;
 
         for (let triangleIndex = 0; triangleIndex < currentNumberOfTriangles; ++triangleIndex) {
             if (this.isInTriangle(triangleIndex, newPoint)) {
-                const A = triangleIndex*3;
-                const B = A+1;
-                const C = A+2;
-            
-                this.corners.push(this.corners[B]);
-                this.corners.push(this.corners[C]);
-                this.corners.push(this.numberOfVertices-1);
-            
-                this.corners.push(this.corners[C]);
-                this.corners.push(this.corners[A]);
-                this.corners.push(this.numberOfVertices-1);
-            
-                this.corners[C] = this.numberOfVertices-1;
-                
-                const dirtyCorner1 = C;
-                const dirtyCorner2 = this.numberOfTriangles*3+2;
-                const dirtyCorner3 = this.numberOfTriangles*3+5;
+                const A: number = triangleIndex*3;
+                const B: number = A+1;
+                const C: number = A+2;
+                const newlyAddedVertexId: number = this._numberOfVertices-1;
 
-                this.numberOfTriangles += 2;
-                this.numberOfCorners += 6;
+                this._corners.push(this._corners[B], this._corners[C], newlyAddedVertexId);
+                this._corners.push(this._corners[C], this._corners[A], newlyAddedVertexId);
+            
+                this._corners[C] = newlyAddedVertexId;
+                
+                const dirtyCorner1: number = C;
+                const dirtyCorner2: number = this._numberOfTriangles*3+2;
+                const dirtyCorner3: number = this._numberOfTriangles*3+5;
+
+                this._numberOfTriangles += 2;
+                this._numberOfCorners += 6;
                 this.fixMesh([dirtyCorner1, dirtyCorner2, dirtyCorner3]);
                 break;
             }
@@ -170,14 +171,14 @@ export default class DelaunayTriangulation extends Mesh2D {
     private updateRendererData(): void {
         this.__trianglesForRenderer = [];
 
-        for (let i = 0; i < this.numberOfTriangles; ++i) {
+        for (let i = 0; i < this._numberOfTriangles; ++i) {
             const cornerId = i*3;
             const triangle = this.getTriangleFromCornerId(cornerId);
             this.__trianglesForRenderer.push(triangle)
         }
 
         // make a deep copy
-        this.__verticesForRenderer = [...this.vertices];
+        this.__verticesForRenderer = [...this._vertices];
         this.__circumcirclesForRenderer = this.__circumcenters.map(
             (center:P5.Vector, idx:number) => new Circle(center, this.__circumcircleRadius[idx]*2) );
     }
@@ -198,7 +199,7 @@ export default class DelaunayTriangulation extends Mesh2D {
         return false;
     }
 
-    public fixMesh(dirtyCorners: number[]): void {
+    public fixMesh(dirtyCorners: Array<number>): void {
         this.buildOTable();
   
         while (dirtyCorners.length > 0) {
@@ -208,23 +209,26 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
 
     public flipCorner(cornerId: number): void {
-        if (cornerId == BOUNDARY)
+        if (cornerId == BOUNDARY) {
             return;
+        }
 
         this.buildOTable();    
 
         // boundary, do nothing..
-        if (this.getOppositeCornerId(cornerId) == BOUNDARY)
+        if (this.getOppositeCornerId(cornerId) == BOUNDARY) {
             return;
+        }
 
         // already satisfy Delaunay property.
-        if (this.isDelaunay(cornerId))
+        if (this.isDelaunay(cornerId)) {
             return;
+        }
 
         const opposite = this.getOppositeCornerId(cornerId);
     
-        this.corners[this.getNextCornerId(cornerId)] = this.corners[opposite];
-        this.corners[this.getNextCornerId(opposite)] = this.corners[cornerId];
+        this._corners[this.getNextCornerId(cornerId)] = this._corners[opposite];
+        this._corners[this.getNextCornerId(opposite)] = this._corners[cornerId];
     
         this.buildOTable();
         this.flipCorner(cornerId);
@@ -233,18 +237,18 @@ export default class DelaunayTriangulation extends Mesh2D {
     }
 
     public isDelaunay(cornerId: number): boolean {
-        const triangle = this.getTriangleFromCornerId(cornerId);
-        const circumcenter = GeometricOperations.circumcenter(triangle);
-        const radius = triangle.ptA.dist(circumcenter);
-        const oppositePoint = this.getGeometry(this.getOppositeCornerId(cornerId));
+        const triangle: Triangle = this.getTriangleFromCornerId(cornerId);
+        const circumcenter: P5.Vector = GeometricOperations.circumcenter(triangle);
+        const radius: number = triangle.ptA.dist(circumcenter);
+        const oppositePoint: P5.Vector = this.getGeometry(this.getOppositeCornerId(cornerId));
 
         return oppositePoint.dist(circumcenter) > radius;
     }
 
     private getTriangleFromCornerId(cornerId: number): Triangle {
-        const pointA = this.getGeometry(cornerId);
-        const pointB = this.getGeometry(this.getPreviousCornerId(cornerId));
-        const pointC = this.getGeometry(this.getNextCornerId(cornerId));
+        const pointA: P5.Vector = this.getGeometry(cornerId);
+        const pointB: P5.Vector = this.getGeometry(this.getPreviousCornerId(cornerId));
+        const pointC: P5.Vector = this.getGeometry(this.getNextCornerId(cornerId));
 
         return new Triangle(pointA, pointB, pointC);
     }
