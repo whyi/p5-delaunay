@@ -1,5 +1,6 @@
 import P5 from "p5";
-import Line from "./Line";
+import Line from "./Primitives/Line";
+import Triangle from "./Primitives/Triangle";
 
 export default abstract class GeometricOperations {
     public static cross2D(U: P5.Vector, V: P5.Vector): number {
@@ -7,13 +8,18 @@ export default abstract class GeometricOperations {
     }
 
     public static isLeftTurn(A: P5.Vector, B: P5.Vector, C: P5.Vector): boolean {
-        const v1 = new P5.Vector(B.x-A.x, B.y-A.y);
-        const v2 = new P5.Vector(C.x-B.x, C.y-B.y);
+        const v1: P5.Vector = new P5.Vector(B.x-A.x, B.y-A.y);
+        const v2: P5.Vector = new P5.Vector(C.x-B.x, C.y-B.y);
     
         return GeometricOperations.cross2D(v1, v2) > 0;
     }
 
-    public static intersection(S: P5.Vector, SE: P5.Vector, Q: P5.Vector, QE: P5.Vector): P5.Vector {
+    public static intersection(line1: Line, line2: Line): P5.Vector {
+        const S: P5.Vector = line1.start;
+        const SE: P5.Vector = line1.end;
+        const Q: P5.Vector = line2.start;
+        const QE: P5.Vector = line2.end;
+
         const tangent = new P5.Vector(SE.x-S.x, SE.y-S.y);
 
         const normalVector = new P5.Vector(QE.x-Q.x, QE.y-Q.y);
@@ -21,10 +27,10 @@ export default abstract class GeometricOperations {
 
         GeometricOperations.leftTurn(normalVector);
 
-        const QS = new P5.Vector(S.x-Q.x, S.y-Q.y);
-        const QSDotNormal = QS.dot(normalVector);
-        const tangentDotNormal = tangent.dot(normalVector);
-        const t = -QSDotNormal/tangentDotNormal;
+        const QS: P5.Vector = new P5.Vector(S.x-Q.x, S.y-Q.y);
+        const QSDotNormal: number = QS.dot(normalVector);
+        const tangentDotNormal: number = tangent.dot(normalVector);
+        const t: number = -QSDotNormal/tangentDotNormal;
 
         if (!isFinite(t)) {
             // return an undefined vector
@@ -36,24 +42,24 @@ export default abstract class GeometricOperations {
         return new P5.Vector(S.x+tangent.x,S.y+tangent.y);
     }
 
-    public static midVector(A: P5.Vector, B: P5.Vector): P5.Vector {
-        return new P5.Vector((A.x + B.x)/2, (A.y + B.y)/2);
+    public static midVector(vecA: P5.Vector, vecB: P5.Vector): P5.Vector {
+        return new P5.Vector((vecA.x + vecB.x)/2, (vecA.y + vecB.y)/2);
     }
 
-    public static circumcenter(A: P5.Vector, B: P5.Vector, C: P5.Vector): P5.Vector {
-        const midAB = GeometricOperations.midVector(A, B);
-        const vecAB = GeometricOperations.makeLeftTurnedVectorFrom(A, B);
-        const line1 = GeometricOperations.makeLineCoordinatesFrom(midAB, vecAB);
+    public static circumcenter(triangle: Triangle): P5.Vector {
+        const midAB: P5.Vector = GeometricOperations.midVector(triangle.ptA, triangle.ptB);
+        const vecAB: P5.Vector = GeometricOperations.makeLeftTurnedVectorFrom(triangle.ptA, triangle.ptB);
+        const line1: Line = GeometricOperations.makeLineCoordinatesFrom(midAB, vecAB);
 
-        const midBC = GeometricOperations.midVector(B, C);
-        const vecBC = GeometricOperations.makeLeftTurnedVectorFrom(B, C);
-        const line2 = GeometricOperations.makeLineCoordinatesFrom(midBC, vecBC);
+        const midBC: P5.Vector = GeometricOperations.midVector(triangle.ptB, triangle.ptC);
+        const vecBC: P5.Vector = GeometricOperations.makeLeftTurnedVectorFrom(triangle.ptB, triangle.ptC);
+        const line2: Line = GeometricOperations.makeLineCoordinatesFrom(midBC, vecBC);
 
-        return GeometricOperations.intersection(line1.start, line1.end, line2.start, line2.end);  
+        return GeometricOperations.intersection(line1, line2);
     }
 
     public static leftTurn(v: P5.Vector): void {
-        const tmp = v.x;
+        const tmp: number = v.x;
         v.x = -v.y;
         v.y = tmp;
     }

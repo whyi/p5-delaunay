@@ -2,7 +2,7 @@
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-98.8%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-92%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.77%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-96.31%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.55%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-93.18%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-96.2%25-brightgreen.svg?style=flat) |
 
 ## Introduction
 * A Typescript + [p5.js](https://github.com/processing/p5.js) port of [Incremental Delaunay Triangulation what was built with processing.js](https://github.com/whyi/Delaunay)

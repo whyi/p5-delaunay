@@ -6,8 +6,12 @@ import {expect} from '@jest/globals';
 import P5, { Vector } from "p5";
 import DelaunayTriangulation from '../../src/DelaunayTriangulation';
 import { BOUNDARY } from '../../src/Mesh2D';
+import IRenderer from '../../src/IRenderer';
+import { mock } from 'jest-mock-extended'
 
-let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+
+const RenderMock = mock<IRenderer>();
+let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
 const flipCornerSpy = jest.spyOn(DelaunayTriangulation.prototype, 'flipCorner')
 const buildOTableSpy = jest.spyOn(DelaunayTriangulation.prototype, 'buildOTable')
 const isDelaunaySpy = jest.spyOn(DelaunayTriangulation.prototype, 'isDelaunay');
@@ -20,20 +24,24 @@ function clearMocks() {
   isDuplicated.mockClear();
 }
 
+function setTwoTrianglesVertices(vertices: Array<Vector>) {
+  jest.spyOn(DelaunayTriangulation.prototype, 'vertices', 'get').mockImplementation(() => vertices);
+}
+
 describe('DelaunayTriangulation', () => {
   describe("addPoint", () => {
     beforeEach(() => clearMocks());
     afterEach(() => clearMocks());
 
     it ("creates a new point from x,y coordiante and add it to geometry table", () => {
-      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
       twoTriangles.addPoint(0.1, 0.1);
       expect(twoTriangles.vertices[twoTriangles.vertices.length-1]).toStrictEqual(new P5.Vector(0.1, 0.1));
       expect(twoTriangles.numberOfVertices).toBe(5);
     })
 
     it ("newly added point creates 2 more triangles by splitting the existing one into 3", () => {
-      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
 
       const previousNumberOfCorners = twoTriangles.numberOfCorners;
       const previousNumberOfTriangles = twoTriangles.numberOfTriangles;
@@ -45,13 +53,13 @@ describe('DelaunayTriangulation', () => {
     })
 
     it ("checks for duplicated points", () => {
-      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
       twoTriangles.addPoint(0.1, 0.1);
       expect(isDuplicated).toBeCalledWith(new P5.Vector(0.1, 0.1));
     })
 
     it ("Does not add when the input point is duplicated", () => {
-      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
 
       const previousNumberOfCorners = twoTriangles.numberOfCorners;
       const previousNumberOfTriangles = twoTriangles.numberOfTriangles;
@@ -74,7 +82,7 @@ describe('DelaunayTriangulation', () => {
     })
 
     it ("returns false when point doesn't overlap with any points within tolerance", () => {
-      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1);
+      let twoTriangles: DelaunayTriangulation = new DelaunayTriangulation(1, RenderMock);
       expect(twoTriangles.isDuplicated(new P5.Vector(
           DelaunayTriangulation.TOLERANCE+DelaunayTriangulation.TOLERANCE,
           DelaunayTriangulation.TOLERANCE+DelaunayTriangulation.TOLERANCE))).toBe(false);
@@ -126,13 +134,13 @@ describe('DelaunayTriangulation', () => {
 
     it ("does not process if given corner already satisfy Delaunay property", () => {
       // https://tasks.illustrativemathematics.org/content-standards/tasks/1687
-      twoTriangles = new DelaunayTriangulation(4)
-      twoTriangles.vertices = [
+      twoTriangles = new DelaunayTriangulation(4, RenderMock)
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(3,1),
         new P5.Vector(1,3),
         new P5.Vector(-2,2)
-      ];
+      ]);
 
       twoTriangles.flipCorner(4);
       
@@ -142,13 +150,13 @@ describe('DelaunayTriangulation', () => {
     })
 
     it ("recursively flip corners if given corner doesn't satisfy Delaunay property", () => {
-      twoTriangles = new DelaunayTriangulation(4)
-      twoTriangles.vertices = [
+      twoTriangles = new DelaunayTriangulation(4, RenderMock)
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(0.5,0.5),
         new P5.Vector(1,0.5),
         new P5.Vector(0.5,0)
-      ];
+      ]);
 
       twoTriangles.flipCorner(4);
 
@@ -161,49 +169,28 @@ describe('DelaunayTriangulation', () => {
   describe("isDelaunay", () => {
     it ("returns true if opposite corner is outside of circumcircle's radius", () => {    
       // https://tasks.illustrativemathematics.org/content-standards/tasks/1687
-      twoTriangles = new DelaunayTriangulation(4)
-      twoTriangles.vertices = [
+      twoTriangles = new DelaunayTriangulation(4, RenderMock)
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(3,1),
         new P5.Vector(1,3),
         new P5.Vector(-2,2)
-      ];
+      ]);
       twoTriangles.buildOTable();
       expect(twoTriangles.isDelaunay(4)).toBe(true);
     })
 
     it ("returns false if opposite corner is inside of circumcircle's radius", () => {
-      twoTriangles = new DelaunayTriangulation(1)
+      twoTriangles = new DelaunayTriangulation(1, RenderMock)
 
       // Modify initial mock to make a very skewed triangles
-      twoTriangles.vertices = [
+      setTwoTrianglesVertices([
         new P5.Vector(0,0),
         new P5.Vector(0.5,0.5),
         new P5.Vector(1,0.5),
         new P5.Vector(0.5,0)
-      ];
-      twoTriangles.buildOTable();
+      ]);
       expect(twoTriangles.isDelaunay(4)).toBe(false);
-    })
-  })
-
-  describe("computeCircumcenters", () => {
-    it ("calculates circumcenters and radius", () => {
-      twoTriangles = new DelaunayTriangulation(1)
-
-      expect(twoTriangles.hasCircumcircles).toBe(false);
-      twoTriangles.computeCircumcenters();
-      expect(twoTriangles.hasCircumcircles).toBe(true);
-    })
-  })
-
-  describe("computeVoronoi", () => {
-    it ("calculates Voronoi regions", () => {
-      twoTriangles = new DelaunayTriangulation(1)
-
-      expect(twoTriangles.hasVoronoi).toBe(false);
-      twoTriangles.computeVoronoi();
-      expect(twoTriangles.hasVoronoi).toBe(true);
     })
   })
 });

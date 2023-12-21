@@ -5,6 +5,8 @@
 import {expect} from '@jest/globals';
 import p5 from "p5";
 import GeometricOperations from '../../src/GeometricOperations';
+import Triangle from '../../src/Primitives/Triangle';
+import Line from '../../src/Primitives/Line';
 
 describe('GeometricOperations', () => {
     describe("Cross product", () => {
@@ -70,7 +72,7 @@ describe('GeometricOperations', () => {
             const vecSE = new p5.Vector(10,5);
             const vecQ = new p5.Vector(5,10);
             const vecQE = new p5.Vector(5,0);
-            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            const result = GeometricOperations.intersection(new Line(vecS, vecSE), new Line(vecQ, vecQE));
             expect(result).toStrictEqual(new p5.Vector(5,5));
         })
 
@@ -84,7 +86,7 @@ describe('GeometricOperations', () => {
             const vecSE = new p5.Vector(10,0);
             const vecQ = new p5.Vector(0,5);
             const vecQE = new p5.Vector(10,5);
-            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            const result = GeometricOperations.intersection(new Line(vecS, vecSE), new Line(vecQ, vecQE));
             expect(result).toStrictEqual(new p5.Vector(undefined,undefined));
         })
 
@@ -100,7 +102,7 @@ describe('GeometricOperations', () => {
             const vecSE = new p5.Vector(10,0);
             const vecQ = new p5.Vector(0,5);
             const vecQE = new p5.Vector(0,-5);
-            const result = GeometricOperations.intersection(vecS, vecSE, vecQ, vecQE);
+            const result = GeometricOperations.intersection(new Line(vecS, vecSE), new Line(vecQ, vecQE));
             expect(result).toStrictEqual(vecS);
         })
     })
@@ -127,7 +129,7 @@ describe('GeometricOperations', () => {
             const pointA = new p5.Vector(0,0);
             const pointB = new p5.Vector(0,1);
             const pointC = new p5.Vector(0.5,1);
-            const result = GeometricOperations.circumcenter(pointA, pointB, pointC);
+            const result = GeometricOperations.circumcenter(new Triangle(pointA, pointB, pointC));
             expect(result).toStrictEqual(new p5.Vector(0.25,0.5));
         })
     })
